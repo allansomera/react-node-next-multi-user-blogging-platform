@@ -1,13 +1,8 @@
 const User = require('../models/userModel')
 const shortId = require('shortid')
 const jwt = require('jsonwebtoken')
-const expressJwt = require('express-jwt')
+const { expressjwt: expressJWT } = require('express-jwt')
 
-exports.requireSignin = expressJwt({
-  secret: process.env.JWT_SECRET,
-  algorithms: ['H256'],
-  userProperty: 'auth',
-})
 exports.signup = async (req, res) => {
   // res.json({ time: Date().toString() })
   const { name, email, password } = req.body
@@ -104,6 +99,7 @@ exports.signin = async (req, res) => {
       }
       // generate a token and send to client, use the user._id to sign the token
       const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+        algorithm: 'HS256',
         expiresIn: '1d',
       })
       res.cookie('token', token, { expiresIn: '1d' })
@@ -119,3 +115,14 @@ exports.signin = async (req, res) => {
     }
   })
 }
+
+exports.signout = (req, res) => {
+  res.clearCookie('token')
+  res.json({ message: 'Signout success' })
+}
+
+exports.requireSignin = expressJWT({
+  secret: process.env.JWT_SECRET,
+  algorithms: ['HS256'],
+  // userProperty: 'auth',
+})

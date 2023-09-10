@@ -24,4 +24,12 @@ router
   .route('/signin')
   .post(userSigninValidator, runValidation, authController.signin)
 
+router.route('/signout').get(authController.signout)
+//test
+router.route('/secret').get(authController.requireSignin, (req, res) => {
+  res.json({
+    message: 'you have access to secret page',
+  })
+})
+
 module.exports = router
