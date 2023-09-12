@@ -1,12 +1,10 @@
 import { Html, Head, Main, NextScript } from 'next/document'
 
 export default function Document() {
+  // const getInitialProps = createGetInitialProps()
   return (
     <Html lang="en">
-      <Head>
-        <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, intial-scale=1.0" />
-      </Head>
+      <Head />
       <body>
         <Main />
         <NextScript />
