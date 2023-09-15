@@ -5,7 +5,9 @@ const { expressjwt: expressJWT } = require('express-jwt')
 
 exports.signup = async (req, res) => {
   // res.json({ time: Date().toString() })
+  console.log('req.body', req.body)
   const { name, email, password } = req.body
+
   // const user = await User.findOne({ email: email })
   // console.log('user', user)
 
@@ -36,7 +38,10 @@ exports.signup = async (req, res) => {
     })
 
     try {
-      const newUser = await user.save() // writes to database
+      // user.password = password // alternative way to handle setters, triggers on assignment
+      const newUser = await user.save() // writes to database, password is virtual and will deal
+      // with hashing the password, the passed 'password'
+      // will not be saved in the database, only the hashed version
 
       //if newUser was successfully saved
       if (newUser) {

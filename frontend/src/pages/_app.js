@@ -1,6 +1,8 @@
 import '@/styles/globals.css'
 import '@/styles/styles.css'
 
+import { baseStyles } from '@nextui-org/react'
+
 import Layout from '@components/layout/layout'
 import { NextUIProvider } from '@nextui-org/react'
 // import { AppProps } from 'next/app'
