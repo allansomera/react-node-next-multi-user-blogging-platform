@@ -50,7 +50,7 @@ const userSchema = new Schema(
       default: null,
     },
   },
-  { timestamps: true }
+  { timestamps: true, strict: true, strictQuery: true }
 )
 
 userSchema

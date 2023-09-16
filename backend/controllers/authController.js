@@ -86,17 +86,21 @@ exports.signup = async (req, res) => {
   // res.status(201).json({ user: 'ok' })
 }
 
-exports.signin = async (req, res) => {
+exports.signin = (req, res) => {
   // check if user exsist
 
   // const { email, password } = req.body
 
   //find user with using the email
-  await User.findOne({ email: req.body.email }).then((user) => {
-    try {
-      if (!user) {
-        throw new Error('User with that email does not exist. Please sign up')
-      }
+  User.findOne({ email: req.body.email })
+    .orFail(
+      () => new Error('User with that email does not exist. Please sign up')
+    )
+    .then((user) => {
+      // if (!user) {
+      //   console.log('in api/singin => if!user()')
+      //   throw new Error('User with that email does not exist. Please sign up')
+      // }
 
       // authenticate
       if (!user.authenticate(req.body.password)) {
@@ -113,12 +117,14 @@ exports.signin = async (req, res) => {
         token,
         user: { _id, username, email, name, role },
       })
-    } catch (e) {
+    })
+    .catch((error) => {
+      console.log('error => ', error)
+      // let e = error
       return res.status(400).json({
-        error: e,
+        error: error.message,
       })
-    }
-  })
+    })
 }
 
 exports.signout = (req, res) => {
