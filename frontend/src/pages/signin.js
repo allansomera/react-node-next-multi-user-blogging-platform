@@ -1,9 +1,18 @@
 import SigninComponent from '@components/auth/signin/signin-component'
+import { isAuth } from 'actions/auth'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 const Signin = () => {
+  let router = useRouter()
+  useEffect(() => {
+    if (isAuth()) {
+      router.replace(`/`)
+    }
+  }, [])
   return (
     <>
-      <h2 className="text-center pb-[10px]">Signin page</h2>
-      <div className="flex justify-center border-dashed border-1 border-red-500">
+      <h1 className="text-center py-[20px]">Signin page</h1>
+      <div className="flex justify-center">
         <SigninComponent />
       </div>
     </>
