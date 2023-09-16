@@ -2,12 +2,12 @@ import React, { useState, useRef } from 'react'
 import { Input, Button } from '@nextui-org/react'
 import { EyeFilledIcon } from '../eye-filled'
 import { EyeSlashFilledIcon } from '../eye-slash-filled'
-import { signup } from 'actions/auth'
+import { signin, authenticate } from 'actions/auth'
+import Router from 'next/router'
 
-const SignupComponent = () => {
+const SigninComponent = () => {
   const formRef = useRef()
   const [values, setValues] = useState({
-    name: '',
     email: '',
     password: '',
     error: '',
@@ -16,7 +16,7 @@ const SignupComponent = () => {
     showForm: true,
   })
 
-  const { name, email, password, error, loading, message, showForm } = values
+  const { email, password, error, loading, message, showForm } = values
 
   const showLoading = () =>
     loading ? (
@@ -55,58 +55,23 @@ const SignupComponent = () => {
     )
   const handleSubmit = async (e) => {
     e.preventDefault()
-    // console.log('submit')
-    // console.table({ name, email, password, error, loading, message, showForm })
-    const user = { name, email, password }
-    // console.log('user', user)
-
-    // setValues({ ...values, loading: true, error: false })
-    // try {
-    //   const response = await signup(user)
-    //   console.log('response signup comp', response)
-    //   if (response.status === 200) {
-    //     console.log('inside 200')
-    //     setValues({
-    //       ...values,
-    //       name: '',
-    //       email: '',
-    //       password: '',
-    //       error: '',
-    //       loading: false,
-    //       mesage: response.data.message,
-    //       showForm: false,
-    //     })
-    //     formRef.current.reset()
-    //   } // console.log('response signup comp', response)
-    //   console.log('values: ', values)
-    // } catch (error) {
-    //   //   setValues({ ...values, loading: false, error: res.error })
-    //   console.log('signup-comp error', error)
-    //   setValues({ ...values, error: true, loading: false })
-    //   console.log('values: ', values)
-    // }
+    const user = { email, password }
 
     // >>>
     setValues({ ...values, loading: true, error: false })
-    signup(user).then((data) => {
-      console.log('data_res: ', data)
-      if (data.error) {
+    signin(user).then((response) => {
+      console.log('response: ', response)
+      if (response.error) {
         // console.log('inside data.error:', data.data.error)
-        setValues({ ...values, error: data.error, loading: false })
+        setValues({ ...values, error: response.error, loading: false })
       } else {
-        console.log('message: ', data.data.message)
-        setValues({
-          ...values,
-          name: '',
-          email: '',
-          password: '',
-          error: '',
-          loading: false,
-          message: data.data.message,
-          showForm: false,
+        let { data } = response
+        // save user token to cookie
+        // save user info to localstorage
+        //authenticate user
+        authenticate(data, () => {
+          Router.push(`/`)
         })
-        // formRef.current.reset()
-        console.log('values: ', values)
       }
     })
     // >>>
@@ -120,7 +85,7 @@ const SignupComponent = () => {
 
   const toggleVisibility = () => setIsVisible(!isVisible)
 
-  const signupForm = () => {
+  const signinForm = () => {
     let variant = 'underlined'
     return (
       <form
@@ -133,13 +98,6 @@ const SignupComponent = () => {
           key={variant}
           className="flex w-full flex-col flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-10 pb-[40px]"
         >
-          <Input
-            onChange={handleChange('name')}
-            value={name}
-            type="text"
-            variant={variant}
-            label="Name"
-          />
           <Input
             onChange={handleChange('email')}
             value={email}
@@ -176,7 +134,7 @@ const SignupComponent = () => {
               className="bg-green-800 text-white-400 w-full"
               type="submit"
             >
-              Sign up
+              Sign In
             </Button>
           </div>
         </div>
@@ -189,9 +147,9 @@ const SignupComponent = () => {
       {showError()}
       {showLoading()}
       {showMessage()}
-      {showForm && signupForm()}
+      {showForm && signinForm()}
     </div>
   )
 }
 
-export default SignupComponent
+export default SigninComponent

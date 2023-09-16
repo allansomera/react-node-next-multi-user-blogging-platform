@@ -50,7 +50,7 @@ const userSchema = new Schema(
       default: null,
     },
   },
-  { timestamps: true }
+  { timestamps: true, strict: true, strictQuery: true }
 )
 
 userSchema
@@ -60,7 +60,7 @@ userSchema
     this._password = password
     //generate salt
     this.salt = this.makeSalt()
-    // encryptPasswordk
+    // encryptPassword
     this.hashed_password = this.encryptPassword(password)
   })
   .get(function () {
