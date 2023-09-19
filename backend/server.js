@@ -19,6 +19,7 @@ require('dotenv').config({ path: path.resolve(process.cwd(), '.env.local') })
 const blogRoutes = require('./routes/blog')
 const authRoutes = require('./routes/auth')
 const userRoutes = require('./routes/user')
+const categoryRoutes = require('./routes/category')
 const server = express()
 
 dbConnect()
@@ -35,6 +36,7 @@ if (process.env.NODE_ENV === 'development') {
 server.use('/api', blogRoutes)
 server.use('/api', authRoutes)
 server.use('/api', userRoutes)
+server.use('/api', categoryRoutes)
 
 // server.get('/api', (req, res) => {
 //   // console.log('db: ', process.env.MONGODB_URI)

@@ -49,6 +49,17 @@ const Header = () => {
         {isAuth() && (
           <>
             <NavbarItem>
+              {isAuth().role === 0 ? (
+                <Link color="foreground" href="/user">
+                  Dashboard
+                </Link>
+              ) : (
+                <Link color="foreground" href="/admin">
+                  Dashboard
+                </Link>
+              )}
+            </NavbarItem>
+            <NavbarItem>
               <Button
                 className="bg-blue-500 text-white-500"
                 onClick={() => signout(() => router.replace(`/signin`))}
