@@ -3,6 +3,7 @@ import { Input, Button } from '@nextui-org/react'
 import { EyeFilledIcon } from '../eye-filled'
 import { EyeSlashFilledIcon } from '../eye-slash-filled'
 import { signin, authenticate } from 'actions/auth'
+import { isAuth } from 'actions/auth'
 import Router from 'next/router'
 
 const SigninComponent = () => {
@@ -70,7 +71,11 @@ const SigninComponent = () => {
         // save user info to localstorage
         //authenticate user
         authenticate(data, () => {
-          Router.push(`/`)
+          if (isAuth() && isAuth().role === 1) {
+            Router.push(`/admin`)
+          } else {
+            Router.push(`/user`)
+          }
         })
       }
     })

@@ -108,6 +108,7 @@ exports.signin = (req, res) => {
       }
       // generate a token and send to client, use the user._id to sign the token
       const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+        // const token = jwt.sign({ user: user._id }, process.env.JWT_SECRET, {
         algorithm: 'HS256',
         expiresIn: '1d',
       })
@@ -132,8 +133,45 @@ exports.signout = (req, res) => {
   res.json({ message: 'Signout success' })
 }
 
+// it will take the token's secret and compare with the JWT_SECRET key
+// setup in the env file
 exports.requireSignin = expressJWT({
   secret: process.env.JWT_SECRET,
   algorithms: ['HS256'],
-  // userProperty: 'auth',
+  requestProperty: 'user',
 })
+
+exports.authMiddleware = (req, res, next) => {
+  const authUserId = req.user._id
+  User.findById({ _id: authUserId })
+    .orFail(() => new Error('User not found'))
+    .then((user) => {
+      req.profile = user
+      next()
+    })
+    .catch((error) => {
+      return res.status(400).json({
+        error: error.message,
+      })
+    })
+}
+
+exports.adminMiddleware = (req, res, next) => {
+  const adminUserId = req.user._id
+  User.findById({ _id: adminUserId })
+    .orFail(() => new Error('User not found'))
+    .then((user) => {
+      if (user.role !== 1) {
+        return res.status(400).json({
+          error: 'Admin resouce. Access denied',
+        })
+      }
+      req.profile = user
+      next()
+    })
+    .catch((error) => {
+      return res.status(400).json({
+        error: error.message,
+      })
+    })
+}

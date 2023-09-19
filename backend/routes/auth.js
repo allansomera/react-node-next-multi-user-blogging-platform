@@ -26,10 +26,11 @@ router
 
 router.route('/signout').get(authController.signout)
 //test
-router.route('/secret').get(authController.requireSignin, (req, res) => {
-  res.json({
-    message: 'you have access to secret page',
-  })
-})
+//this route will have access to the cookie which would have the keys "token and  user"
+// router.route('/secret').get(authController.requireSignin, (req, res) => {
+//   res.status(200).json({
+//     user: req.user,
+//   })
+// })
 
 module.exports = router
