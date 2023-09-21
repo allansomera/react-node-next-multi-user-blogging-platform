@@ -7,7 +7,12 @@ function Layout(props) {
   return (
     <Fragment>
       <Header />
-      <main>{props.children}</main>
+      {
+        // <main >{props.children}</main>
+      }
+      <main className="dark text-foreground bg-background">
+        {props.children}
+      </main>
     </Fragment>
   )
 }
