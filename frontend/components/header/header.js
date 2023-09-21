@@ -1,9 +1,11 @@
 import { AcmeLogo } from './acme'
 import { APP_NAME } from 'config'
 import { isAuth, signout } from 'actions/auth'
+// import NProgress from 'nprogress'
 import Link from 'next/link'
 
-import React from 'react'
+import nProgress from 'nprogress'
+import React, { useEffect } from 'react'
 import {
   Navbar,
   NavbarBrand,
@@ -11,13 +13,50 @@ import {
   NavbarItem,
   Button,
 } from '@nextui-org/react'
-import { useRouter } from 'next/router'
-import dynamic from 'next/dynamic'
+import Router, { useRouter } from 'next/router'
+
+const changeComplete = () => {
+  nProgress.set(0.99)
+  window.setTimeout(() => {
+    nProgress.done(true)
+  }, 500)
+  // return nProgress.done(true)
+}
+
+nProgress.configure({
+  minimum: 0.1,
+  showSpinner: false,
+  trickle: true,
+  // trickleRate: 0.7,
+  // trickleSpeed: 200,
+  // easing: 'ease',
+  speed: 500,
+})
+
+// Router.events.on('routeChangeStart', nProgress.start)
+// // Router.events.on('routeChangeComplete ', changeComplete)
+// Router.events.on('routeChangeComplete ', nProgress.done)
+// Router.events.on('routeChangeError', nProgress.done)
+Router.onRouteChangeStart = () => nProgress.start()
+Router.onRouteChangeComplete = () => nProgress.done()
+Router.onRouteChangeError = () => nProgress.done()
 
 const Header = () => {
-  let router = useRouter()
+  // const router = useRouter()
+  // useEffect(() => {
+  //   router.events.on('routeChangeStart', () => setTimeout(nProgress.start, 100))
+  //   router.events.on('routeChangeComplete ', () => changeComplete())
+  //   // Router.events.on('routeChangeComplete ', nProgress.done)
+  //   router.events.on('routeChangeError', nProgress.done)
+  //   return () => {
+  //     router.events.off('routeChangeStart', nProgress.start)
+  //     // Router.events.on('routeChangeComplete ', changeComplete)
+  //     router.events.off('routeChangeComplete ', nProgress.done)
+  //     router.events.off('routeChangeError', nProgress.done)
+  //   }
+  // }, [router.asPath])
   return (
-    <Navbar>
+    <Navbar className="bg-black">
       <Link href="/">
         <NavbarBrand>
           <AcmeLogo />
