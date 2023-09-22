@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import AdminWrapper from '@components/auth/protected/admin-wrapper'
 import Category from '@components/crud/category'
+import Tag from '@components/crud/tag'
 
 const CategoryTag = () => {
   return (
@@ -15,7 +16,7 @@ const CategoryTag = () => {
               <Category />
             </div>
             <div>
-              <p>Tags</p>
+              <Tag />
             </div>
           </div>
         </div>

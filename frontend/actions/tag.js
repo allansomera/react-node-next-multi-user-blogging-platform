@@ -1,13 +1,13 @@
 import axios from 'axios'
 import { API } from 'config'
 
-export const create = (category, token) => {
+export const create = (tag, token) => {
   // let { email, password } = user
   return axios
     .post(
       `${API}/api/tag`,
       {
-        category,
+        name: tag,
       },
       {
         headers: {
@@ -18,12 +18,12 @@ export const create = (category, token) => {
       }
     )
     .then((response) => {
-      console.log('resonpose', response)
-      console.log('resonpose.data', response.data)
+      // console.log('resonpose', response)
+      // console.log('resonpose.data', response.data)
       return response
     })
     .catch((err) => {
-      console.log('actions auth axios error:', err.response.data)
+      console.log('actions auth axios error:', err.message)
       return err.response.data
     })
 }
@@ -32,12 +32,12 @@ export const getTags = () => {
   return axios
     .get(`${API}/api/tags`)
     .then((response) => {
-      return response.status(200).json()
+      return response.data
     })
     .catch((error) => console.log(error))
 }
 
-export const singleCategory = (slug) => {
+export const singleTag = (slug) => {
   return axios
     .get(`${API}/api/tag/${slug}`)
     .then((response) => {
@@ -46,11 +46,15 @@ export const singleCategory = (slug) => {
     .catch((error) => console.log(error))
 }
 
-export const removeCategory = (slug) => {
+export const removeTag = (slug, token) => {
   return axios
-    .delete(`${API}/api/tag/${slug}`)
+    .delete(`${API}/api/tag/${slug}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
     .then((response) => {
-      return response.status(200).json()
+      return response
     })
     .catch((error) => console.log(error))
 }

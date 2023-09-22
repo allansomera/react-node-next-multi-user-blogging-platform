@@ -7,7 +7,7 @@ import {
   removeCategory,
 } from 'actions/category'
 
-// import { Button } from '@nextui-org/react'
+import { Button } from '@nextui-org/react'
 
 const Category = () => {
   const [values, setValues] = useState({
@@ -22,9 +22,9 @@ const Category = () => {
   const { name, error, success, categories, removed, reload } = values
   const token = getCookie('token')
 
-  useEffect(() => {
-    loadCategories()
-  }, [])
+  // useEffect(() => {
+  //   loadCategories()
+  // }, [])
 
   useEffect(() => {
     loadCategories()
@@ -54,7 +54,7 @@ const Category = () => {
           onDoubleClick={() => deleteConfirm(c.slug)}
           title="Double click to delete"
           key={i}
-          className="mb-[5px] border-solid border-sky-700 border-1 p-[10px] m-[5px]"
+          className="my-[5px] mr-[5px] border-solid border-sky-700 border-1 p-[10px] "
         >
           {c.slug}
         </button>
@@ -144,7 +144,7 @@ const Category = () => {
     return (
       <form onSubmit={clickSubmit}>
         <div className="form-group flex flex-col">
-          <label className="text-muted">Name</label>
+          <label className="text-muted">Category Name</label>
           <input
             type="text"
             className="form-control"
@@ -154,9 +154,13 @@ const Category = () => {
           />
         </div>
         <div>
-          <button type="submit" className="btn btn-primary">
+          <Button
+            type="submit"
+            className="bg-transparent border-1 border-solid my-[10px] border-green-600 text-green-600 rounded-none"
+            // className="cat_tag_form_btn"
+          >
             Create
-          </button>
+          </Button>
         </div>
       </form>
     )
@@ -169,7 +173,7 @@ const Category = () => {
       {showRemoved()}
       <div onMouseMove={mouseMoveHandler} className="flex flex-col">
         {newCategoryForm()}
-        <div className="flex-row">{showCategories()}</div>
+        <div className="cat__list flex-row">{showCategories()}</div>
       </div>
     </>
   )
