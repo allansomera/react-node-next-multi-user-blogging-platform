@@ -10,8 +10,8 @@ const CategoryTag = () => {
           <div className="px-[20px] py-[20px]">
             <h1>Manage Categories and Tags</h1>
           </div>
-          <div className="max-w-xs flex pl-[20px] gap-[200px] pb-[20px]">
-            <div>
+          <div className="w-[800px] flex pl-[20px] gap-[200px] pb-[20px]">
+            <div className="w-[500px]">
               <Category />
             </div>
             <div>

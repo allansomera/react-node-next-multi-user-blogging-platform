@@ -3,6 +3,7 @@ const slugify = require('slugify')
 
 exports.create = async (req, res) => {
   const { name } = req.body
+  console.log('category name: ', name)
   let slug = slugify(name).toLowerCase()
   await new Tag({ name, slug })
     .save()

@@ -7,6 +7,8 @@ import {
   removeCategory,
 } from 'actions/category'
 
+// import { Button } from '@nextui-org/react'
+
 const Category = () => {
   const [values, setValues] = useState({
     name: '',
@@ -22,6 +24,10 @@ const Category = () => {
 
   useEffect(() => {
     loadCategories()
+  }, [])
+
+  useEffect(() => {
+    loadCategories()
   }, [reload])
 
   const loadCategories = () => {
@@ -32,19 +38,26 @@ const Category = () => {
       // } else {
       //   setValues({ ...values, categories: data })
       // }
+      // let data_copy = [...data]
+      // setValues((prev) => {
+      //   return { ...prev, categories: [...data] }
+      // })
       setValues({ ...values, categories: data })
+      console.log('load categories: ', values.categories)
     })
   }
 
   const showCategories = () => {
-    return categories.map((c, i) => {
+    return categories?.map((c, i) => {
       return (
         <button
           onDoubleClick={() => deleteConfirm(c.slug)}
           title="Double click to delete"
           key={i}
-          className="btn mmr-1 ml-1 mt-3"
-        ></button>
+          className="mb-[5px] border-solid border-sky-700 border-1 p-[10px] m-[5px]"
+        >
+          {c.slug}
+        </button>
       )
     })
   }
@@ -60,6 +73,7 @@ const Category = () => {
 
   const deleteCategory = (slug) => {
     removeCategory(slug, token).then((data) => {
+      console.log('remove (data) => ', data)
       if (data.error) {
         console.log(data.error)
       } else {
@@ -77,16 +91,16 @@ const Category = () => {
 
   const clickSubmit = (e) => {
     e.preventDefault()
-    create({ name }, token).then((data) => {
+    create(name, token).then((data) => {
       if (data.error) {
         setValues({ ...values, error: data.error, success: false })
       } else {
         setValues({
           ...values,
           error: false,
-          success: false,
+          success: true,
           name: '',
-          removed: !removed,
+          removed: false,
           reload: !reload,
         })
       }
@@ -101,6 +115,7 @@ const Category = () => {
       success: false,
       removed: '',
     })
+    console.log(values)
   }
 
   const showSuccess = () => {
@@ -125,10 +140,10 @@ const Category = () => {
     setValues({ ...values, error: false, success: false, removed: '' })
   }
 
-  const newCatgoryForm = () => {
+  const newCategoryForm = () => {
     return (
       <form onSubmit={clickSubmit}>
-        <div className="form-group">
+        <div className="form-group flex flex-col">
           <label className="text-muted">Name</label>
           <input
             type="text"
@@ -152,9 +167,9 @@ const Category = () => {
       {showSuccess()}
       {showError()}
       {showRemoved()}
-      <div onMouseMove={mouseMoveHandler}>
-        {newCatgoryForm()}
-        {showCategories}
+      <div onMouseMove={mouseMoveHandler} className="flex flex-col">
+        {newCategoryForm()}
+        <div className="flex-row">{showCategories()}</div>
       </div>
     </>
   )

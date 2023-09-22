@@ -5,9 +5,9 @@ export const create = (category, token) => {
   // let { email, password } = user
   return axios
     .post(
-      `${API}/api/category`,
+      `${API}/api/tag`,
       {
-        name: category,
+        category,
       },
       {
         headers: {
@@ -19,42 +19,38 @@ export const create = (category, token) => {
     )
     .then((response) => {
       console.log('resonpose', response)
-      // console.log('resonpose.data', response.data)
+      console.log('resonpose.data', response.data)
       return response
     })
     .catch((err) => {
-      console.log('actions auth axios error:', err.message)
-      return err.message
+      console.log('actions auth axios error:', err.response.data)
+      return err.response.data
     })
 }
 
-export const getCategories = () => {
+export const getTags = () => {
   return axios
-    .get(`${API}/api/categories`)
+    .get(`${API}/api/tags`)
     .then((response) => {
-      return response.data
+      return response.status(200).json()
     })
     .catch((error) => console.log(error))
 }
 
 export const singleCategory = (slug) => {
   return axios
-    .get(`${API}/api/category/${slug}`)
+    .get(`${API}/api/tag/${slug}`)
     .then((response) => {
-      return response.json()
+      return response.status(200).json()
     })
     .catch((error) => console.log(error))
 }
 
-export const removeCategory = (slug, token) => {
+export const removeCategory = (slug) => {
   return axios
-    .delete(`${API}/api/category/${slug}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    .delete(`${API}/api/tag/${slug}`)
     .then((response) => {
-      return response.data
+      return response.status(200).json()
     })
-    .catch((error) => console.log(error.message))
+    .catch((error) => console.log(error))
 }
