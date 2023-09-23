@@ -2,10 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer component {
+@layer components {
+    .cat_tag_form_btn {
+        @apply bg-transparent border-1 border-solid my-[10px] border-green-600 text-green-600 rounded-none;
+    }
+
     .blue_bg {
         @apply bg-blue-900 text-red-500;
     }
+    
 }
 
 @layer base {

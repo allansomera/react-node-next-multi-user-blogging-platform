@@ -18,13 +18,15 @@ router
     authController.adminMiddleware,
     tagController.create
   )
+
+router
+  .route('/tag/:slug')
+  .get(tagController.read)
   .delete(
     authController.requireSignin,
     authController.adminMiddleware,
     tagController.remove
   )
-  .get(tagController.read)
-
 router.route('/tags').get(tagController.list)
 
 module.exports = router
