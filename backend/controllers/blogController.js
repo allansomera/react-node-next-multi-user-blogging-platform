@@ -8,6 +8,7 @@ const { stripHtml } = require('string-strip-html')
 const _ = require('lodash')
 const fs = require('fs')
 const mongoose = require('mongoose')
+const { smartTrim } = require('../helpers/blog')
 // const path = require('path')
 
 exports.create = async (req, res) => {
@@ -113,6 +114,7 @@ exports.create = async (req, res) => {
     let blog = new Blog()
     blog.title = title
     blog.body = body
+    blog.excerpt = smartTrim(body, 320, ' ', ' ...')
     blog.categories = categories
     blog.tags = tags
     blog.slug = slugify(title).toLowerCase()
