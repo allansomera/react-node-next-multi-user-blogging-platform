@@ -15,7 +15,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@components/*": ["./components/*"]
+      "@components/*": ["./components/*"],
+      "@actions/*": ["./actions/*"]
     }
   },
   "exclude": ["node_modules"]

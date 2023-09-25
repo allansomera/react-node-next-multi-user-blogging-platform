@@ -12,4 +12,8 @@ router
     blogController.create
   )
 
+// router.route('/blog/:slug').get()
+
+router.route('/blogs').get(blogController.list)
+
 module.exports = router

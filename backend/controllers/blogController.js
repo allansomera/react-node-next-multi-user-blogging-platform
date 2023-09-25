@@ -168,3 +168,21 @@ exports.create = async (req, res) => {
     }
   })
 }
+
+//implement
+// list
+// read
+// remove
+exports.list = async (_, res) => {
+  await Blog.find({})
+    .orFail(() => new Error('Could not get blogs'))
+    .exec()
+    .then((data) => {
+      res.status(200).json(data)
+    })
+    .catch((error) => {
+      return res.status(400).json({
+        error: error.message,
+      })
+    })
+}
