@@ -1,8 +1,11 @@
-import { getCookie } from 'actions/auth'
+// import { getCookie } from 'actions/auth'
+
 import { useEffect, useState } from 'react'
-import { create, getTags, singleTag, removeTag } from 'actions/tag'
+// import { create, getTags, singleTag, removeTag } from 'actions/tag'
+import { create, getTags, removeTag } from '@actions/tag'
 
 import { Button } from '@nextui-org/react'
+import { getCookie } from '@actions/auth'
 
 const Tag = () => {
   const [values, setValues] = useState({
@@ -38,7 +41,7 @@ const Tag = () => {
       //   return { ...prev, categories: [...data] }
       // })
       setValues({ ...values, tags: data })
-      console.log('load tags: ', values.categories)
+      console.log('load tags: ', values.tags)
     })
   }
 

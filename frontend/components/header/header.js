@@ -101,7 +101,7 @@ const Header = () => {
             <NavbarItem>
               <Button
                 className="bg-blue-500 text-white-500"
-                onClick={() => signout(() => router.replace(`/signin`))}
+                onClick={() => signout(() => Router.replace(`/signin`))}
               >
                 Sign out
               </Button>

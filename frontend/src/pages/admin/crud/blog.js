@@ -1,8 +1,13 @@
 import Link from 'next/link'
 
 import AdminWrapper from '@components/auth/protected/admin-wrapper'
-import CreateBlog from '@components/crud/create-blog'
+// import CreateBlog from '@components/crud/create-blog'
+import dynamic from 'next/dynamic'
+const CreateBlog = dynamic(() => import('@components/crud/create-blog'), {
+  ssr: false,
+})
 
+// const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 const Blog = () => {
   return (
     <>
