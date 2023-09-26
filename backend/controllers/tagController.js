@@ -17,7 +17,7 @@ exports.create = async (req, res) => {
     })
 }
 
-exports.list = async (_, res) => {
+exports.listTags = async (_, res) => {
   await Tag.find({})
     .orFail(() => new Error('Could not get tags'))
     .exec()

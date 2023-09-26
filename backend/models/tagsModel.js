@@ -21,6 +21,6 @@ const tagSchema = new Schema(
 
 // var M = mongoose.model('Actor', schema, collectionName);
 // 3rd parameter is the collection name we manually set
-const Tag = models?.Category || model('Tag', tagSchema)
+const Tag = models?.Tag || model('Tag', tagSchema)
 
 module.exports = Tag
