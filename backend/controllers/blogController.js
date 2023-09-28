@@ -11,11 +11,11 @@ const mongoose = require('mongoose')
 const { smartTrim } = require('../helpers/blog')
 // const path = require('path')
 
-exports.create = async (req, res) => {
+exports.create = (req, res) => {
   let form = new formidable.IncomingForm({ keepExtensions: true })
   // console.log(form)
   // form.keepExtension = true
-  form.parse(req, async (err, fields, files) => {
+  form.parse(req, (err, fields, files) => {
     if (err) {
       return res.status(400).json({
         error: 'Image could not be uploaded',
@@ -31,7 +31,7 @@ exports.create = async (req, res) => {
       })
     } else if (
       fields.hasOwnProperty('title') &&
-      (!fields.title[0] || !fields.title[0].length)
+      (!fields.title[0] || !fields.title[0].length === 0)
     ) {
       return res.status(400).json({
         error: 'title is required and should not be empty',
@@ -133,39 +133,45 @@ exports.create = async (req, res) => {
       blog.photo.data = fs.readFileSync(files.photo[0].filepath)
       blog.photo.contentType = files.photo[0].mimetype
 
-      await blog.save().then((result) => {
-        return res.status(200).json({
-          result,
-        })
-
-        //commented code block below doesnt work
-        //   Blog.findByIdAndUpdate(
-        //     result._id,
-        //     { $push: { categories: categories } },
-        //     { new: true }
-        //   )
-        //     .exec()
-        //     .then((_) => {
-        //       Blog.findByIdAndUpdate(
-        //         result._id,
-        //         { $push: { tags: tags } },
-        //         { new: true }
-        //       )
-        //         .exec()
-        //         .then((_) => {
-        //           return res.status(200).json(result)
-        //         })
-        //         .catch((error) => {
-        //           return res.status(400).json({ error: error.message })
-        //         })
-        //     })
-        // })
-        // .catch((error) => {
-        //   return res.status(400).json({
-        //     error: error.message,
-        //   })
-      })
+      // blog.save().then((result) => {
+      //   return res.status(200).json({
+      //     result,
+      //   })
+      //
+      //   //commented code block below doesnt work
+      //   //   Blog.findByIdAndUpdate(
+      //   //     result._id,
+      //   //     { $push: { categories: categories } },
+      //   //     { new: true }
+      //   //   )
+      //   //     .exec()
+      //   //     .then((_) => {
+      //   //       Blog.findByIdAndUpdate(
+      //   //         result._id,
+      //   //         { $push: { tags: tags } },
+      //   //         { new: true }
+      //   //       )
+      //   //         .exec()
+      //   //         .then((_) => {
+      //   //           return res.status(200).json(result)
+      //   //         })
+      //   //         .catch((error) => {
+      //   //           return res.status(400).json({ error: error.message })
+      //   //         })
+      //   //     })
+      //   // })
+      //   // .catch((error) => {
+      //   //   return res.status(400).json({
+      //   //     error: error.message,
+      //   //   })
+      // })
     }
+
+    blog.save().then((result) => {
+      return res.status(200).json({
+        result,
+      })
+    })
   })
 }
 
