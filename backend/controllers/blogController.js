@@ -362,4 +362,97 @@ exports.remove = async (req, res) => {
       return res.status(400).json({ error: error.message })
     })
 }
-exports.update = async (req, res) => {}
+exports.update = async (req, res) => {
+  let slug = req.params.slug.toLowerCase()
+
+  await Blog.findOne({ slug })
+    .orFail(() => new Error(`could not find blog with slug => ${slug} `))
+    .exec()
+    .then((old_blog) => {
+      let form = new formidable.IncomingForm({ keepExtensions: true })
+      form.parse(req, async (err, fields, files) => {
+        let slugBeforeMerge = old_blog.slug
+        //
+        console.log('fields', fields)
+        let categories
+        let tags
+        let title
+
+        if (fields.hasOwnProperty('categories')) {
+          categories =
+            fields.categories[0] &&
+            fields.categories[0].split(',').map((id) => {
+              return mongoose.mongo.ObjectId.createFromHexString(id.trim())
+            })
+        }
+
+        if (fields.hasOwnProperty('tags')) {
+          tags =
+            fields.tags[0] &&
+            fields.tags[0].split(',').map((id) => {
+              return mongoose.mongo.ObjectId.createFromHexString(id.trim())
+            })
+        }
+
+        // let new_fields =
+        //   categories && tags ? { ...fields, categories, tags } : { ...fields }
+
+        // console.log('categories_BE', categories)
+        // console.log('tags_BE', tags)
+
+        let new_fields
+        if (categories && tags) {
+          new_fields = { ...fields, categories, tags }
+        } else if (categories) {
+          new_fields = { ...fields, categories }
+        } else if (tags) {
+          new_fields = { ...fields, tags }
+        } else {
+          new_fields = { ...fields }
+        }
+
+        if (fields.hasOwnProperty('title')) {
+          title = fields.title[0]
+          new_fields = { ...new_fields, title }
+        }
+
+        // let new_fields = { ...fields, categories, tags }
+
+        old_blog = _.merge(old_blog, new_fields)
+
+        old_blog.slug = slugBeforeMerge
+
+        // const title = fields.title[0]
+        // const body = fields.body[0]
+
+        const { body } = old_blog
+
+        // const body = fields.body[0]
+
+        if (body) {
+          old_blog.excerpt = smartTrim(body, 320, ' ', ' ...')
+          old_blog.mdesc = stripHtml(body.substring(0, 160)).result
+          // console.log('old_blog.mdesc', old_blog.mdesc)
+        }
+
+        if (files.photo) {
+          if (files.photo.size > 10000000) {
+            return res.status(400).json({
+              error: 'Image should be less than 1mb in size',
+            })
+          }
+          old_blog.photo.data = fs.readFileSync(files.photo[0].filepath)
+          old_blog.photo.contentType = files.photo[0].mimetype
+        }
+
+        // console.log('new_fields', old_blog)
+        // return res.json(old_blog)
+
+        await old_blog.save().then((result) => {
+          return res.status(200).json({
+            result,
+          })
+        })
+      })
+    })
+}
