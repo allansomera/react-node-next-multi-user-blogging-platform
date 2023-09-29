@@ -11,11 +11,11 @@ const mongoose = require('mongoose')
 const { smartTrim } = require('../helpers/blog')
 // const path = require('path')
 
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
   let form = new formidable.IncomingForm({ keepExtensions: true })
   // console.log(form)
   // form.keepExtension = true
-  form.parse(req, (err, fields, files) => {
+  form.parse(req, async (err, fields, files) => {
     if (err) {
       return res.status(400).json({
         error: 'Image could not be uploaded',
@@ -167,7 +167,7 @@ exports.create = (req, res) => {
       // })
     }
 
-    blog.save().then((result) => {
+    await blog.save().then((result) => {
       return res.status(200).json({
         result,
       })
@@ -180,11 +180,83 @@ exports.create = (req, res) => {
 // read
 // remove
 exports.list = async (_, res) => {
-  await Blog.find({})
-    .orFail(() => new Error('Could not get blogs'))
+  // await Blog.find({})
+  //   .orFail(() => new Error('Could not get blogs'))
+  //   .exec()
+  //   .then((data) => {
+  //     res.status(200).json(data)
+  //   })
+  //   .catch((error) => {
+  //     return res.status(400).json({
+  //       error: error.message,
+  //     })
+  //   })
+
+  // await Blog.find({})
+  //   .populate('categories', '_id name slug')
+  //   .populate('tags', '_id name slug')
+  //   .populate('postedBy', '_id name username')
+  //   .select(
+  //     '_id title slug excerpt categories tags postedBy createdAt updatedAt'
+  //   )
+  //   .orFail(() => new Error('Could not get blogs'))
+  //   .exec()
+  //   .then((data) => {
+  //     return res.status(200).json(data)
+  //   })
+  //   .catch((error) => {
+  //     return res.status(400).json({
+  //       error: error.message,
+  //     })
+  //   })
+
+  await Blog.aggregate([
+    {
+      $lookup: {
+        from: 'categories',
+        localField: 'categories',
+        foreignField: '_id',
+        pipeline: [{ $project: { _id: 1, name: 1, slug: 1 } }],
+        as: 'categories',
+      },
+    },
+    {
+      $lookup: {
+        from: 'tags',
+        localField: 'tags',
+        foreignField: '_id',
+        pipeline: [{ $project: { _id: 1, name: 1, slug: 1 } }],
+        as: 'tags',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        title: 1,
+        slug: 1,
+        excerpt: 1,
+        categories: 1,
+        tags: 1,
+        postedBy: 1,
+        createdAt: 1,
+        updatedAt: 1,
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'postedBy',
+        foreignField: '_id',
+        pipeline: [{ $project: { id: 1, name: 1, username: 1 } }],
+        as: 'postedBy',
+      },
+    },
+    { $unwind: '$postedBy' },
+  ])
+    // .orFail(() => new Error('Could not get blogs'))
     .exec()
     .then((data) => {
-      res.status(200).json(data)
+      return res.status(200).json(data)
     })
     .catch((error) => {
       return res.status(400).json({
@@ -192,3 +264,65 @@ exports.list = async (_, res) => {
       })
     })
 }
+
+exports.listAllBlogsCategoriesTags = async (req, res) => {
+  let limit = req.body.limit ? parseInt(req.body.limit) : 10
+  let skip = req.body.skip ? parseInt(req.body.skip) : 0
+
+  let blogs
+  let categories
+  let tags
+
+  await Blog.find({})
+    .populate('categories', '_id name slug')
+    .populate('tags', '_id name slug')
+    .populate('postedBy', '_id name username profile')
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .select(
+      '_id title slug excerpt categories tags postedBy createdAt updatedAt'
+    )
+    .orFail(() => new Error('Could not get blogs'))
+    .exec()
+    .then(async (data) => {
+      // get all blogs
+      blogs = data
+      // get all categories
+      categories = await Category.find({})
+        .orFail(() => new Error('couldnt find categories'))
+        .exec()
+        .then((cat_data) => {
+          return cat_data
+        })
+        .catch((error) => {
+          return res.status(400).json({
+            error: error.message,
+          })
+        })
+
+      tags = await Tag.find({})
+        .orFail(() => new Error('couldnt find tags'))
+        .exec()
+        .then((tag_data) => {
+          return tag_data
+        })
+        .catch((error) => {
+          return res.status(400).json({
+            error: error.message,
+          })
+        })
+
+      return res
+        .status(200)
+        .json({ blogs, categories, tags, size: blogs.length })
+    })
+    .catch((error) => {
+      return res.status(400).json({
+        error: error.message,
+      })
+    })
+}
+exports.singleBlog = async (req, res) => {}
+exports.remove = async (req, res) => {}
+exports.update = async (req, res) => {}

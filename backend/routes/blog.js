@@ -12,8 +12,23 @@ router
     blogController.create
   )
 
-// router.route('/blog/:slug').get()
+router
+  .route('/blog/:slug')
+  .get(blogController.singleBlog)
+  .delete(
+    authController.requireSignin,
+    authController.adminMiddleware,
+    blogController.remove
+  )
+  .put(
+    authController.requireSignin,
+    authController.adminMiddleware,
+    blogController.update
+  )
 
 router.route('/blogs').get(blogController.list)
+router
+  .route('/blogs-categories-tags')
+  .post(blogController.listAllBlogsCategoriesTags)
 
 module.exports = router

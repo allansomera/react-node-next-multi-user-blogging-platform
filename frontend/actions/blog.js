@@ -13,20 +13,22 @@ export const createBlog = (blog, token) => {
       Authorization: `Bearer ${token}`,
     },
   }
-  return axios
-    .request(reqOptions)
-    .then((response) => {
-      console.log('reqOptions', response)
-      // return response
-    })
-    .then((r) => {
-      console.log('r: ', r)
-      return r
-    })
-    .catch((err) => {
-      console.log('actions auth axios error:', err.message)
-      return err.response.data
-    })
+  return (
+    axios
+      .request(reqOptions)
+      .then((response) => {
+        console.log('reqOptions', response)
+        return response.data
+      })
+      // .then((r) => {
+      //   console.log('r: ', r)
+      //   return r.data
+      // })
+      .catch((err) => {
+        console.log('actions auth axios error:', err.message)
+        return err.response.data
+      })
+  )
 
   // return axios
   //   .post(

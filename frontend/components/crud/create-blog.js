@@ -42,7 +42,7 @@ const CreateBlog = ({ router }) => {
   })
 
   let [body, setBody] = useState(blogFromLS())
-  let [title_n, setTitle_n] = useState(titleFromLS())
+  // let [title_n, setTitle_n] = useState(titleFromLS())
   const { error, sizeError, success, formData, title, hidePublishButton } =
     values
   let [categories, setCategories] = useState([])
@@ -53,9 +53,11 @@ const CreateBlog = ({ router }) => {
 
   useEffect(() => {
     setValues({ ...values, formData: new FormData() })
-    setBody(JSON.parse(localStorage.getItem('blog')))
+    if (localStorage.getItem('blog')) {
+      setBody(JSON.parse(localStorage.getItem('blog')))
+    }
     // formData.set('body', JSON.parse(localStorage.getItem('body')))
-    setTitle_n(JSON.parse(localStorage.getItem('title')))
+    // setTitle_n(JSON.parse(localStorage.getItem('title')))
     // formData.set('title', JSON.parse(localStorage.getItem('title')))
     initCategories()
     initTags()
@@ -82,14 +84,34 @@ const CreateBlog = ({ router }) => {
     // console.log('new_fd_title: ', new_fd.get('title'))
     // console.log('new_fd_body: ', new_fd.get('body'))
 
-    createBlog(formData, token)
-      .then((data) => {
-        // console.log('publish_blog: ', ...data)
-        console.log('createBlog response data: ', data)
-      })
-      .catch((error) => {
-        console.log(error.message)
-      })
+    createBlog(formData, token).then((data) => {
+      console.log('publish_blog: ', data)
+      // console.log('createBlog response data: ', data)
+      if (data.error) {
+        console.log('data_error', data.error)
+        setValues({
+          ...values,
+          title: '',
+          error: data.error,
+          success: '',
+        })
+      } else {
+        setValues({
+          ...values,
+          title: '',
+          error: '',
+          success: `A new blog titled ${data.result.title} is created`,
+        })
+        setBody('')
+        setCheckedCategories([])
+        setCheckedTags([])
+        initCategories()
+        initTags()
+      }
+    })
+    // .catch((error) => {
+    //   console.log(error.message)
+    // })
   }
 
   const initCategories = () => {
@@ -118,20 +140,20 @@ const CreateBlog = ({ router }) => {
     // console.log(e.target.value)
     let value = name === 'photo' ? e.target.files[0] : e.target.value
 
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('title', JSON.stringify(e.target.value))
-    }
+    // if (typeof window !== 'undefined') {
+    //   localStorage.setItem('title', JSON.stringify(e.target.value))
+    // }
 
     formData.set(name, value)
-    if (name === 'title') {
-      setTitle_n(e.target.value)
-      setValues({ ...values, title: title_n })
-    }
+    // if (name === 'title') {
+    //   setTitle_n(e.target.value)
+    //   setValues({ ...values, title: title_n })
+    // }
     // for (const val of formData.values()) {
     //   console.log(val)
     // }
-    console.log('handle_change name: ', name)
-    console.log('handle_change value: ', value)
+    // console.log('handle_change name: ', name)
+    // console.log('handle_change value: ', value)
     setValues({ ...values, [name]: value, formData, error: '' })
   }
 
@@ -180,7 +202,7 @@ const CreateBlog = ({ router }) => {
         {categories &&
           categories.map((cat, i) => {
             return (
-              <li className="list-unstyled" key={i}>
+              <li className="list-unstyled" key={cat._id}>
                 <input
                   onChange={handleToggleCategories(cat._id)}
                   type="checkbox"
@@ -200,7 +222,7 @@ const CreateBlog = ({ router }) => {
         {tags &&
           tags.map((tag, i) => {
             return (
-              <li className="list-unstyled" key={i}>
+              <li className="list-unstyled" key={tag._id}>
                 <input
                   onChange={handleToggleTags(tag._id)}
                   type="checkbox"
@@ -216,40 +238,70 @@ const CreateBlog = ({ router }) => {
 
   const createBlogForm = () => {
     return (
-      <form
-        onSubmit={publishBlog}
-        className="border-dashed border-1 border-green-400"
-      >
-        <div className="mt-3">
-          <label className="mr-3">Title</label>
-          <input
-            type="text"
-            className="form-control"
-            onChange={handleChange('title')}
-            value={title_n}
-            // value={title}
-          />
-        </div>
-        <div>
-          <ReactQuill
-            className="mt-3"
-            modules={CreateBlog.modules}
-            formats={CreateBlog.formats}
-            value={body}
-            placeholder="type here"
-            onChange={handleBody}
-          />
-        </div>
-        <div>
-          <Button className="mt-3 bg-sky-800" type="submit">
-            Publish
-          </Button>
-        </div>
-      </form>
+      <>
+        <form
+          onSubmit={publishBlog}
+          className="border-dashed border-1 border-green-400"
+        >
+          <div className="mt-3">
+            <label className="mr-3">Title</label>
+            <input
+              type="text"
+              className="form-control"
+              onChange={handleChange('title')}
+              value={title}
+              // value={title}
+            />
+          </div>
+          <div>
+            <ReactQuill
+              className="mt-3"
+              modules={CreateBlog.modules}
+              formats={CreateBlog.formats}
+              value={body}
+              placeholder="type here"
+              onChange={handleBody}
+            />
+          </div>
+          <div>
+            <Button className="mt-3 bg-sky-800" type="submit">
+              Publish
+            </Button>
+          </div>
+          {showError()}
+          {showSuccess()}
+        </form>
+      </>
     )
   }
   const onInputFileBtnClick = () => {
     input_file_ref.current.click()
+  }
+
+  const showError = () => {
+    return (
+      <>
+        <div
+          className="mb-4 rounded-lg bg-danger-100 px-6 py-5 text-base text-danger-700 my-[24px]"
+          style={{ display: error ? '' : 'none' }}
+        >
+          {error}
+        </div>
+      </>
+    )
+  }
+
+  const showSuccess = () => {
+    return (
+      <>
+        <div
+          className="mb-4 rounded-lg bg-secondary-100 px-6 py-5 text-base text-secondary-800 my-[16px]"
+          style={{ display: success ? '' : 'none' }}
+        >
+          {success}
+        </div>
+      </>
+    )
   }
 
   return (
@@ -289,15 +341,6 @@ const CreateBlog = ({ router }) => {
             </div>
           </div>
         </div>
-        <hr />
-        {JSON.stringify(title)}
-        <hr />
-        {JSON.stringify(body)}
-        <hr />
-        {JSON.stringify(categories)}
-        <hr />
-        {JSON.stringify(tags)}
-        <hr />
       </div>
     </>
   )
