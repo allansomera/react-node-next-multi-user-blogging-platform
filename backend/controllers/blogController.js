@@ -323,6 +323,43 @@ exports.listAllBlogsCategoriesTags = async (req, res) => {
       })
     })
 }
-exports.singleBlog = async (req, res) => {}
-exports.remove = async (req, res) => {}
+
+exports.singleBlog = async (req, res) => {
+  let slug = req.params.slug.toLowerCase()
+  // await Blog.findOne({slug})
+  await Blog.findOne({ slug: `${slug}` })
+    .populate('categories', '_id name slug')
+    .populate('tags', '_id name slug')
+    .populate('postedBy', '_id name username profile')
+    .select(
+      '_id title slug body mtitle mdesc categories tags postedBy createdAt updatedAt'
+    )
+    .orFail(() => new Error(`couldnt find blog with slug => ${slug}`))
+    .exec()
+    .then((data) => {
+      return res.status(200).json(data)
+    })
+    .catch((error) => {
+      return res.status(400).json({
+        error: error.message,
+      })
+    })
+}
+
+exports.remove = async (req, res) => {
+  let slug = req.params.slug.toLowerCase()
+
+  await Blog.findOneAndRemove({ slug: `${slug}` })
+    .orFail(() => new Error(`could not delete blog with slug => ${slug}`))
+    .exec()
+    .then((data) => {
+      return res.status(200).json({
+        message: `blog ${slug} has been successfully deleted`,
+        data,
+      })
+    })
+    .catch((error) => {
+      return res.status(400).json({ error: error.message })
+    })
+}
 exports.update = async (req, res) => {}
