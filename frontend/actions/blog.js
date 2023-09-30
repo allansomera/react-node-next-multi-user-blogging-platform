@@ -94,3 +94,13 @@ export const removeBlog = (slug, token) => {
     })
     .catch((error) => console.log(error))
 }
+
+export const listBlogsWithCategoriesAndTags = () => {
+  return axios
+    .post(`${API}/api/blogs-categories-tags`)
+    .then((response) => {
+      console.log('blogs-categories-tags', response)
+      return response.data
+    })
+    .catch((error) => console.log(error))
+}

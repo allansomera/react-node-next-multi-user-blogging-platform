@@ -31,4 +31,5 @@ router
   .route('/blogs-categories-tags')
   .post(blogController.listAllBlogsCategoriesTags)
 
+router.route('/blog/photo/:slug').get(blogController.photo)
 module.exports = router

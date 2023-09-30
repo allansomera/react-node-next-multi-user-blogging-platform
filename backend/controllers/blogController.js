@@ -370,7 +370,7 @@ exports.update = async (req, res) => {
     .exec()
     .then((old_blog) => {
       let form = new formidable.IncomingForm({ keepExtensions: true })
-      form.parse(req, async (err, fields, files) => {
+      form.parse(req, async (_err, fields, files) => {
         let slugBeforeMerge = old_blog.slug
         //
         console.log('fields', fields)
@@ -453,6 +453,23 @@ exports.update = async (req, res) => {
             result,
           })
         })
+      })
+    })
+}
+
+exports.photo = async (req, res) => {
+  let slug = req.params.slug.toLowerCase()
+  await Blog.findOne({ slug })
+    .select('photo')
+    .orFail(() => new Error('no photo found'))
+    .exec()
+    .then((blog) => {
+      res.set('Content-Type', blog.photo.contentType)
+      return res.send(blog.photo.data)
+    })
+    .catch((error) => {
+      return res.status(400).json({
+        error: error.message,
       })
     })
 }

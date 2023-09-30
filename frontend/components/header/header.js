@@ -65,11 +65,9 @@ const Header = () => {
       </Link>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         {
-          // <NavbarItem isActive>
-          //   <Link href="/" aria-current="page">
-          //   Home
-          //   </Link>
-          // </NavbarItem>
+          <NavbarItem>
+            <Link href="/blogs">Blog</Link>
+          </NavbarItem>
         }
         {!isAuth() && (
           <>
