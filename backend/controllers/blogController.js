@@ -266,8 +266,17 @@ exports.list = async (_, res) => {
 }
 
 exports.listAllBlogsCategoriesTags = async (req, res) => {
-  let limit = req.body.limit ? parseInt(req.body.limit) : 10
   let skip = req.body.skip ? parseInt(req.body.skip) : 0
+  let limit = req.body.limit
+    ? parseInt(req.body.limit) <= 0
+      ? 1
+      : parseInt(req.body.limit)
+    : 10
+  // let limit = req.body.limit ? parseInt(req.body.limit) : 10
+  console.log('req.body.skip', req.body.skip)
+  console.log('req.body.limit', req.body.limit)
+  console.log('skip', skip)
+  console.log('limit', limit)
 
   let blogs
   let categories
@@ -313,9 +322,11 @@ exports.listAllBlogsCategoriesTags = async (req, res) => {
           })
         })
 
+      let all_count = await Blog.estimatedDocumentCount()
+
       return res
         .status(200)
-        .json({ blogs, categories, tags, size: blogs.length })
+        .json({ blogs, categories, tags, size: blogs.length, all_count })
     })
     .catch((error) => {
       return res.status(400).json({

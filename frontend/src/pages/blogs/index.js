@@ -1,18 +1,121 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { useState } from 'react'
+import { withRouter } from 'next/router'
 
 import { listBlogsWithCategoriesAndTags } from '@actions/blog'
 
-import { API } from 'config'
+import { API, DOMAIN, APP_NAME } from 'config'
 import Card from '@components/blog/card'
+import { Button } from '@nextui-org/react'
 
-const Blogs = ({ blogs, categories, tags, size }) => {
+//you also get router as props by default when you includ withRouter from 'next/router'
+const Blogs = ({
+  blogs,
+  categories,
+  tags,
+  totalBlogs,
+  blogsLimit,
+  blogSkip,
+  all_count,
+  router,
+}) => {
   console.log('blogs =>', blogs)
   console.log('blogs.categories =>', blogs.categories)
   console.log('categories =>', categories)
   console.log('tags =>', tags)
-  console.log('size=>', size)
+  console.log('totalBlogs=>', totalBlogs)
+  console.log('all_count=>', all_count)
+  console.log('blogsLimit=>', blogsLimit)
+  console.log('blogSkip=>', blogSkip)
+
+  const head = () => {
+    return (
+      <Head>
+        <title>Programming blogs | {APP_NAME}</title>
+        <meta
+          name="description"
+          content="Programming blogs and tutorials on react node next web development"
+        />
+        <link rel="canonical" href={`${DOMAIN}${router.pathname}`} />
+        <meta
+          property="og:title"
+          content={`Latest web development tutorials | ${APP_NAME}`}
+        />
+        <meta
+          property="og:description"
+          content="Programming blogs and tutorials on react node next web development"
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${DOMAIN}${router.pathname}`} />
+        <meta property="og:site_name" content={`${APP_NAME}`} />
+
+        <meta
+          property="og:image"
+          content={`${DOMAIN}/static/images/seoblog.jpg`}
+        />
+        <meta
+          property="og:image:secure_url"
+          content={`${DOMAIN}/static/images/seoblog.jpg`}
+        />
+        <meta property="og:image:type" content="image/jpg" />
+      </Head>
+    )
+  }
+
+  const [limit, setLimit] = useState(blogsLimit)
+  const [skip, setSkip] = useState(0)
+  const [size, setSize] = useState(totalBlogs)
+  const [loadedBlogs, setLoadedBlogs] = useState([])
+
+  const loadMore = async () => {
+    let toSkip = skip + limit
+    console.log('before limit =>', limit)
+    console.log('before skip=>', skip)
+    console.log('before size=>', size)
+    console.log('before loadedBlogs =>', loadedBlogs)
+    await listBlogsWithCategoriesAndTags(toSkip, limit)
+      .then((data) => {
+        console.log('loadMore data => ', data)
+        setLoadedBlogs([...loadedBlogs, ...data.blogs])
+        setSize(data.size)
+        setSkip(toSkip)
+
+        console.log('current limit =>', limit)
+        console.log('current skip=>', skip)
+        console.log('current size=>', size)
+        console.log('current loadedBlogs =>', loadedBlogs)
+      })
+      .catch((error) => {
+        console.log(error.message)
+      })
+  }
+
+  //all_count represents the whole count from blogs collection, need to -1 because count starts from 0
+  // because skip starts from 0
+  const loadMoreButton = () => {
+    return (
+      size > 0 &&
+      size >= limit &&
+      skip !== all_count - 1 &&
+      limit !== all_count &&
+      limit !== 0 && <Button onClick={loadMore}>Load More</Button>
+    )
+  }
+
+  const showLoadedBlogs = () => {
+    return (
+      <>
+        {loadedBlogs.map((blog) => {
+          return (
+            <article key={blog._id}>
+              <Card blog={blog} />
+            </article>
+          )
+        })}
+      </>
+    )
+  }
 
   const showAllBlogs = () => {
     return (
@@ -65,6 +168,7 @@ const Blogs = ({ blogs, categories, tags, size }) => {
 
   return (
     <>
+      {head()}
       <main role="main">
         <div className="container-fluid">
           <header>
@@ -84,6 +188,12 @@ const Blogs = ({ blogs, categories, tags, size }) => {
           <div className="blogs__container border-green-200 border-dashed border-1">
             {showAllBlogs()}
           </div>
+          <div className="blogs__loadmore border-green-200 border-dashed border-1">
+            {showLoadedBlogs()}
+          </div>
+          <div className="blogs__loadmore-btn border-green-200 border-dashed border-1">
+            {loadMoreButton()}
+          </div>
         </div>
       </main>
     </>
@@ -93,14 +203,21 @@ const Blogs = ({ blogs, categories, tags, size }) => {
 // after it calls this method and we get a successful response from the backend
 // we are able to access the object as props, in this case {blogs, categories, tags, size}
 Blogs.getInitialProps = async () => {
-  return await listBlogsWithCategoriesAndTags()
+  //think of skip to be the index of the array, if skip equals to 2, it will start from the 3rd index
+  // of the blog
+  let skip = 0
+  let limit = 2
+  return await listBlogsWithCategoriesAndTags(skip, limit)
     .then((data) => {
       // console.log('getInitialProps data: ', data)
       return {
         blogs: data.blogs,
         categories: data.categories,
         tags: data.tags,
-        size: data.size,
+        totalBlogs: data.size,
+        blogsLimit: limit,
+        blogSkip: skip,
+        all_count: data.all_count,
       }
     })
     .catch((error) => {
@@ -108,5 +225,5 @@ Blogs.getInitialProps = async () => {
     })
 }
 
-export default Blogs
+export default withRouter(Blogs)
 //getInitialProps

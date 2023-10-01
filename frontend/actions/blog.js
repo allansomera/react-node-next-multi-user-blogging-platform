@@ -95,9 +95,10 @@ export const removeBlog = (slug, token) => {
     .catch((error) => console.log(error))
 }
 
-export const listBlogsWithCategoriesAndTags = () => {
+export const listBlogsWithCategoriesAndTags = (skip, limit) => {
+  const data = { skip, limit }
   return axios
-    .post(`${API}/api/blogs-categories-tags`)
+    .post(`${API}/api/blogs-categories-tags`, data)
     .then((response) => {
       console.log('blogs-categories-tags', response)
       return response.data
