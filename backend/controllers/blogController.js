@@ -31,7 +31,7 @@ exports.create = async (req, res) => {
       })
     } else if (
       fields.hasOwnProperty('title') &&
-      (!fields.title[0] || !fields.title[0].length)
+      (!fields.title[0] || !fields.title[0].length === 0)
     ) {
       return res.status(400).json({
         error: 'title is required and should not be empty',
@@ -133,38 +133,354 @@ exports.create = async (req, res) => {
       blog.photo.data = fs.readFileSync(files.photo[0].filepath)
       blog.photo.contentType = files.photo[0].mimetype
 
-      await blog.save().then((result) => {
-        return res.status(200).json({
-          result,
+      // blog.save().then((result) => {
+      //   return res.status(200).json({
+      //     result,
+      //   })
+      //
+      //   //commented code block below doesnt work
+      //   //   Blog.findByIdAndUpdate(
+      //   //     result._id,
+      //   //     { $push: { categories: categories } },
+      //   //     { new: true }
+      //   //   )
+      //   //     .exec()
+      //   //     .then((_) => {
+      //   //       Blog.findByIdAndUpdate(
+      //   //         result._id,
+      //   //         { $push: { tags: tags } },
+      //   //         { new: true }
+      //   //       )
+      //   //         .exec()
+      //   //         .then((_) => {
+      //   //           return res.status(200).json(result)
+      //   //         })
+      //   //         .catch((error) => {
+      //   //           return res.status(400).json({ error: error.message })
+      //   //         })
+      //   //     })
+      //   // })
+      //   // .catch((error) => {
+      //   //   return res.status(400).json({
+      //   //     error: error.message,
+      //   //   })
+      // })
+    }
+
+    await blog.save().then((result) => {
+      return res.status(200).json({
+        result,
+      })
+    })
+  })
+}
+
+//implement
+// list
+// read
+// remove
+exports.list = async (_, res) => {
+  // await Blog.find({})
+  //   .orFail(() => new Error('Could not get blogs'))
+  //   .exec()
+  //   .then((data) => {
+  //     res.status(200).json(data)
+  //   })
+  //   .catch((error) => {
+  //     return res.status(400).json({
+  //       error: error.message,
+  //     })
+  //   })
+
+  // await Blog.find({})
+  //   .populate('categories', '_id name slug')
+  //   .populate('tags', '_id name slug')
+  //   .populate('postedBy', '_id name username')
+  //   .select(
+  //     '_id title slug excerpt categories tags postedBy createdAt updatedAt'
+  //   )
+  //   .orFail(() => new Error('Could not get blogs'))
+  //   .exec()
+  //   .then((data) => {
+  //     return res.status(200).json(data)
+  //   })
+  //   .catch((error) => {
+  //     return res.status(400).json({
+  //       error: error.message,
+  //     })
+  //   })
+
+  await Blog.aggregate([
+    {
+      $lookup: {
+        from: 'categories',
+        localField: 'categories',
+        foreignField: '_id',
+        pipeline: [{ $project: { _id: 1, name: 1, slug: 1 } }],
+        as: 'categories',
+      },
+    },
+    {
+      $lookup: {
+        from: 'tags',
+        localField: 'tags',
+        foreignField: '_id',
+        pipeline: [{ $project: { _id: 1, name: 1, slug: 1 } }],
+        as: 'tags',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        title: 1,
+        slug: 1,
+        excerpt: 1,
+        categories: 1,
+        tags: 1,
+        postedBy: 1,
+        createdAt: 1,
+        updatedAt: 1,
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'postedBy',
+        foreignField: '_id',
+        pipeline: [{ $project: { id: 1, name: 1, username: 1 } }],
+        as: 'postedBy',
+      },
+    },
+    { $unwind: '$postedBy' },
+  ])
+    // .orFail(() => new Error('Could not get blogs'))
+    .exec()
+    .then((data) => {
+      return res.status(200).json(data)
+    })
+    .catch((error) => {
+      return res.status(400).json({
+        error: error.message,
+      })
+    })
+}
+
+exports.listAllBlogsCategoriesTags = async (req, res) => {
+  let skip = req.body.skip ? parseInt(req.body.skip) : 0
+  let limit = req.body.limit
+    ? parseInt(req.body.limit) <= 0
+      ? 1
+      : parseInt(req.body.limit)
+    : 10
+  // let limit = req.body.limit ? parseInt(req.body.limit) : 10
+  console.log('req.body.skip', req.body.skip)
+  console.log('req.body.limit', req.body.limit)
+  console.log('skip', skip)
+  console.log('limit', limit)
+
+  let blogs
+  let categories
+  let tags
+
+  await Blog.find({})
+    .populate('categories', '_id name slug')
+    .populate('tags', '_id name slug')
+    .populate('postedBy', '_id name username profile')
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .select(
+      '_id title slug excerpt categories tags postedBy createdAt updatedAt'
+    )
+    .orFail(() => new Error('Could not get blogs'))
+    .exec()
+    .then(async (data) => {
+      // get all blogs
+      blogs = data
+      // get all categories
+      categories = await Category.find({})
+        .orFail(() => new Error('couldnt find categories'))
+        .exec()
+        .then((cat_data) => {
+          return cat_data
+        })
+        .catch((error) => {
+          return res.status(400).json({
+            error: error.message,
+          })
         })
 
-        //commented code block below doesnt work
-        //   Blog.findByIdAndUpdate(
-        //     result._id,
-        //     { $push: { categories: categories } },
-        //     { new: true }
-        //   )
-        //     .exec()
-        //     .then((_) => {
-        //       Blog.findByIdAndUpdate(
-        //         result._id,
-        //         { $push: { tags: tags } },
-        //         { new: true }
-        //       )
-        //         .exec()
-        //         .then((_) => {
-        //           return res.status(200).json(result)
-        //         })
-        //         .catch((error) => {
-        //           return res.status(400).json({ error: error.message })
-        //         })
-        //     })
-        // })
-        // .catch((error) => {
-        //   return res.status(400).json({
-        //     error: error.message,
-        //   })
+      tags = await Tag.find({})
+        .orFail(() => new Error('couldnt find tags'))
+        .exec()
+        .then((tag_data) => {
+          return tag_data
+        })
+        .catch((error) => {
+          return res.status(400).json({
+            error: error.message,
+          })
+        })
+
+      let all_count = await Blog.estimatedDocumentCount()
+
+      return res
+        .status(200)
+        .json({ blogs, categories, tags, size: blogs.length, all_count })
+    })
+    .catch((error) => {
+      return res.status(400).json({
+        error: error.message,
       })
-    }
-  })
+    })
+}
+
+exports.singleBlog = async (req, res) => {
+  let slug = req.params.slug.toLowerCase()
+  // await Blog.findOne({slug})
+  await Blog.findOne({ slug: `${slug}` })
+    .populate('categories', '_id name slug')
+    .populate('tags', '_id name slug')
+    .populate('postedBy', '_id name username profile')
+    .select(
+      '_id title slug body mtitle mdesc categories tags postedBy createdAt updatedAt'
+    )
+    .orFail(() => new Error(`couldnt find blog with slug => ${slug}`))
+    .exec()
+    .then((data) => {
+      return res.status(200).json(data)
+    })
+    .catch((error) => {
+      return res.status(400).json({
+        error: error.message,
+      })
+    })
+}
+
+exports.remove = async (req, res) => {
+  let slug = req.params.slug.toLowerCase()
+
+  await Blog.findOneAndRemove({ slug: `${slug}` })
+    .orFail(() => new Error(`could not delete blog with slug => ${slug}`))
+    .exec()
+    .then((data) => {
+      return res.status(200).json({
+        message: `blog ${slug} has been successfully deleted`,
+        data,
+      })
+    })
+    .catch((error) => {
+      return res.status(400).json({ error: error.message })
+    })
+}
+exports.update = async (req, res) => {
+  let slug = req.params.slug.toLowerCase()
+
+  await Blog.findOne({ slug })
+    .orFail(() => new Error(`could not find blog with slug => ${slug} `))
+    .exec()
+    .then((old_blog) => {
+      let form = new formidable.IncomingForm({ keepExtensions: true })
+      form.parse(req, async (_err, fields, files) => {
+        let slugBeforeMerge = old_blog.slug
+        //
+        console.log('fields', fields)
+        let categories
+        let tags
+        let title
+
+        if (fields.hasOwnProperty('categories')) {
+          categories =
+            fields.categories[0] &&
+            fields.categories[0].split(',').map((id) => {
+              return mongoose.mongo.ObjectId.createFromHexString(id.trim())
+            })
+        }
+
+        if (fields.hasOwnProperty('tags')) {
+          tags =
+            fields.tags[0] &&
+            fields.tags[0].split(',').map((id) => {
+              return mongoose.mongo.ObjectId.createFromHexString(id.trim())
+            })
+        }
+
+        // let new_fields =
+        //   categories && tags ? { ...fields, categories, tags } : { ...fields }
+
+        // console.log('categories_BE', categories)
+        // console.log('tags_BE', tags)
+
+        let new_fields
+        if (categories && tags) {
+          new_fields = { ...fields, categories, tags }
+        } else if (categories) {
+          new_fields = { ...fields, categories }
+        } else if (tags) {
+          new_fields = { ...fields, tags }
+        } else {
+          new_fields = { ...fields }
+        }
+
+        if (fields.hasOwnProperty('title')) {
+          title = fields.title[0]
+          new_fields = { ...new_fields, title }
+        }
+
+        // let new_fields = { ...fields, categories, tags }
+
+        old_blog = _.merge(old_blog, new_fields)
+
+        old_blog.slug = slugBeforeMerge
+
+        // const title = fields.title[0]
+        // const body = fields.body[0]
+
+        const { body } = old_blog
+
+        // const body = fields.body[0]
+
+        if (body) {
+          old_blog.excerpt = smartTrim(body, 320, ' ', ' ...')
+          old_blog.mdesc = stripHtml(body.substring(0, 160)).result
+          // console.log('old_blog.mdesc', old_blog.mdesc)
+        }
+
+        if (files.photo) {
+          if (files.photo.size > 10000000) {
+            return res.status(400).json({
+              error: 'Image should be less than 1mb in size',
+            })
+          }
+          old_blog.photo.data = fs.readFileSync(files.photo[0].filepath)
+          old_blog.photo.contentType = files.photo[0].mimetype
+        }
+
+        // console.log('new_fields', old_blog)
+        // return res.json(old_blog)
+
+        await old_blog.save().then((result) => {
+          return res.status(200).json({
+            result,
+          })
+        })
+      })
+    })
+}
+
+exports.photo = async (req, res) => {
+  let slug = req.params.slug.toLowerCase()
+  await Blog.findOne({ slug })
+    .select('photo')
+    .orFail(() => new Error('no photo found'))
+    .exec()
+    .then((blog) => {
+      res.set('Content-Type', blog.photo.contentType)
+      return res.send(blog.photo.data)
+    })
+    .catch((error) => {
+      return res.status(400).json({
+        error: error.message,
+      })
+    })
 }

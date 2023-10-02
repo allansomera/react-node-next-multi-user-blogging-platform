@@ -27,6 +27,7 @@ router
     authController.adminMiddleware,
     tagController.remove
   )
-router.route('/tags').get(tagController.list)
+
+router.route('/tags').get(tagController.listTags)
 
 module.exports = router

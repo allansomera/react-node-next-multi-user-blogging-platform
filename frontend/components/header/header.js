@@ -65,11 +65,9 @@ const Header = () => {
       </Link>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         {
-          // <NavbarItem isActive>
-          //   <Link href="/" aria-current="page">
-          //   Home
-          //   </Link>
-          // </NavbarItem>
+          <NavbarItem>
+            <Link href="/blogs">Blog</Link>
+          </NavbarItem>
         }
         {!isAuth() && (
           <>
@@ -101,7 +99,7 @@ const Header = () => {
             <NavbarItem>
               <Button
                 className="bg-blue-500 text-white-500"
-                onClick={() => signout(() => router.replace(`/signin`))}
+                onClick={() => signout(() => Router.replace(`/signin`))}
               >
                 Sign out
               </Button>
