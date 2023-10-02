@@ -77,7 +77,8 @@ export const singleBlog = (slug) => {
   return axios
     .get(`${API}/api/blog/${slug}`)
     .then((response) => {
-      return response.status(200).json()
+      // console.log('singleBlog_actions => ', response.data)
+      return response.data
     })
     .catch((error) => console.log(error))
 }
