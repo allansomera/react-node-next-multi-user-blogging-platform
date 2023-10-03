@@ -468,6 +468,72 @@ exports.update = async (req, res) => {
     })
 }
 
+exports.list_related_categories = async (req, res) => {
+  // let cat_slug = req.body.cat_slug
+  // let cat_id = mongoose.mongo.ObjectId.createFromHexString(req.body.cat_id)
+  let cat_id = req.body.cat_id
+
+  await Blog.aggregate([
+    {
+      $lookup: {
+        from: 'categories',
+        localField: 'categories',
+        foreignField: '_id',
+        pipeline: [{ $project: { _id: 1, name: 1, slug: 1 } }],
+        as: 'categories',
+      },
+    },
+    {
+      $match: {
+        'categories._id': new mongoose.Types.ObjectId(cat_id),
+        // 'categories._id': cat_id,
+      },
+    },
+    // {
+    //   $addFields: {
+    //     categories: {
+    //       $filter: {
+    //         input: '$categories',
+    //         as: 'c',
+    //         cond: { $eq: ['$$c.slug', cat_slug] },
+    //       },
+    //     },
+    //   },
+    // },
+    // {
+    //   $match: { categories: { $ne: [] } },
+    // },
+  ])
+    .then((data) => {
+      return res.status(200).json(data)
+    })
+    .catch((error) => {
+      return res.status(400).json(error.message)
+    })
+}
+
+// relative to the single blog, check related blogs by category not including
+// the current single blog
+exports.list_related = async (req, res) => {
+  let limit = req.body.limit ? parseInt(req.body.limit) : 3
+  let { _id, categories } = req.body.blog
+
+  // find other blogs not including itself
+  await Blog.find({ _id: { $ne: _id }, categories: { $in: categories } })
+    .limit(limit)
+    .populate('postedBy', '_id name profile')
+    .select('title slug excerpt postedBy createdAt updatedAt')
+    .exec()
+    .then((data) => {
+      return res.status(200).json(data)
+    })
+    .catch((error) => {
+      return res.status(400).json({
+        error: error.message,
+      })
+    })
+}
+
 exports.photo = async (req, res) => {
   let slug = req.params.slug.toLowerCase()
   await Blog.findOne({ slug })

@@ -1,12 +1,16 @@
 import Head from 'next/head'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { withRouter } from 'next/router'
 
-import { singleBlog } from '@actions/blog'
+import {
+  singleBlog,
+  relatedBlogsByCategories,
+  listRelatedBlogs,
+} from '@actions/blog'
 
 import { API, DOMAIN, APP_NAME } from 'config'
-import Card from '@components/blog/card'
+import SmallCard from '@components/blog/small-card'
 import { Button } from '@nextui-org/react'
 import Image from 'next/image'
 import dayjs from 'dayjs'
@@ -16,7 +20,25 @@ import htmr from 'htmr'
 // const SingleBlog = ({ blog, router }) => {
 const SingleBlog = ({ blog, query }) => {
   dayjs.extend(relativeTime)
-  console.log('query => ', query)
+  // console.log('query => ', query)
+
+  const [related, setRelated] = useState([])
+  const loadRelated = async () => {
+    listRelatedBlogs(blog)
+      .then((data) => {
+        setRelated(data)
+      })
+      .catch((error) => {
+        console.log(error.message)
+      })
+  }
+
+  //loads when component loads
+  //loads when the slug changes
+  useEffect(() => {
+    console.log('useEffect query.slug', query.slug)
+    loadRelated()
+  }, [query.slug])
 
   const head = () => {
     return (
@@ -45,13 +67,39 @@ const SingleBlog = ({ blog, query }) => {
     )
   }
 
+  const relatedCategories = async (cat_id) => {
+    // console.log('cat_id => ', cat_id)
+    // console.log('typeof cat_id', typeof cat_id)
+    let data = await relatedBlogsByCategories(cat_id)
+    console.log('relatedBlogs', data)
+  }
+
+  const relatedBlogs_handler = async (blog) => {
+    // console.log(blog)
+    let data = await listRelatedBlogs(blog)
+    console.log('listRelatedBlogs', data)
+  }
+
+  const showRelatedBlogs = () => {
+    return related.map((b, i) => {
+      return (
+        <div key={i}>
+          <SmallCard blog={b} />
+        </div>
+      )
+    })
+  }
+
   const showBlogCategories = () => {
     return (
       <>
         {blog.categories.map((category) => {
           return (
             <article key={category._id}>
-              <Link href={`/categories/${category.slug}`}>
+              {
+                // <Link href={`/categories/${category.slug}`}>
+              }
+              <Link href="#" onClick={() => relatedBlogs_handler(blog)}>
                 <div className="mr-1 border-solid border-1 bg-sky-700 text-white p-2 rounded">
                   {category.name}
                 </div>
@@ -121,9 +169,11 @@ const SingleBlog = ({ blog, query }) => {
             </div>
 
             <div className="related-container">
-              <h2 className="text-center text-4xl pb-4">Related bogs</h2>
+              <h2 className="text-center text-4xl pb-4">Related blogs</h2>
               <hr />
-              <p>show related blogs</p>
+              <div className="flex flex-row gap-[16px]">
+                {showRelatedBlogs()}
+              </div>
             </div>
 
             <div>
