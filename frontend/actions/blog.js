@@ -101,8 +101,33 @@ export const listBlogsWithCategoriesAndTags = (skip, limit) => {
   return axios
     .post(`${API}/api/blogs-categories-tags`, data)
     .then((response) => {
-      console.log('blogs-categories-tags', response)
+      // console.log('blogs-categories-tags', response)
       return response.data
     })
-    .catch((error) => console.log(error))
+    .catch((error) => console.log(error.message))
+}
+
+export const relatedBlogsByCategories = (cat_id) => {
+  const data = { cat_id }
+  return axios
+    .post(`${API}/api/blogs/related/categories`, data)
+    .then((response) => {
+      return response.data
+    })
+    .catch((error) => {
+      console.log(error.message)
+    })
+}
+
+export const listRelatedBlogs = (one_blog) => {
+  let data = { blog: one_blog }
+  return axios
+    .post(`${API}/api/blogs/related`, data)
+    .then((response) => {
+      // console.log('/blogs/related', response.data)
+      return response.data
+    })
+    .catch((error) => {
+      console.log(error.message)
+    })
 }
