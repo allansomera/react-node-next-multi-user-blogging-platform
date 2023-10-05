@@ -435,7 +435,7 @@ exports.update = async (req, res) => {
         // old_blog = _.merge(old_blog, new_fields)
 
         // this merge will replace the old array with the new array
-        old_blog = _.mergeWith(old_blog, new_fields, (a, b) =>
+        old_blog = _.mergeWith(old_blog, new_fields, (_a, b) =>
           _.isObject(b) ? b : undefined
         )
 

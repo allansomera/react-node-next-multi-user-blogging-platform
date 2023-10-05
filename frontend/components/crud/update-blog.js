@@ -9,7 +9,8 @@ import { getTags } from '@actions/tag'
 import { Button } from '@nextui-org/react'
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 import '../../node_modules/react-quill/dist/quill.snow.css'
-import { DOMAIN } from 'config'
+import { API } from 'config'
+import Image from 'next/image'
 
 const UpdateBlog = ({ router }) => {
   const input_file_ref = useRef()
@@ -248,6 +249,12 @@ const UpdateBlog = ({ router }) => {
           </div>
           {showError()}
           {showSuccess()}
+          <Image
+            src={`${API}/api/blog/photo/${router.query.slug}`}
+            alt={title}
+            width={300}
+            height={300}
+          />
         </form>
       </>
     )
@@ -353,7 +360,7 @@ const UpdateBlog = ({ router }) => {
               </Button>
             </div>
 
-            <div className="show__categories max-h-[200px] overflow-y-scroll">
+            <div className="show__categories max-h-[200px] overflow-y-hidden">
               <h2>Categories</h2>
               <hr />
               <ul>{showCategories()}</ul>
