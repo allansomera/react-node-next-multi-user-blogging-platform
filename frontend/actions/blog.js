@@ -91,7 +91,7 @@ export const removeBlog = (slug, token) => {
       },
     })
     .then((response) => {
-      return response
+      return response.data
     })
     .catch((error) => console.log(error))
 }
@@ -129,5 +129,29 @@ export const listRelatedBlogs = (one_blog) => {
     })
     .catch((error) => {
       console.log(error.message)
+    })
+}
+
+export const updateBlog = (blog, token, slug) => {
+  // let { email, password } = user
+  let reqOptions = {
+    url: `${API}/api/blog/${slug}`,
+    method: 'PUT',
+    data: blog,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      // 'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  }
+  return axios
+    .request(reqOptions)
+    .then((response) => {
+      console.log('reqOptions', response)
+      return response.data
+    })
+    .catch((err) => {
+      console.log('actions auth axios error:', err.message)
+      return err.response.data
     })
 }

@@ -206,7 +206,7 @@ Blogs.getInitialProps = async () => {
   //think of skip to be the index of the array, if skip equals to 2, it will start from the 3rd index
   // of the blog
   let skip = 0
-  let limit = 1
+  let limit = 3
   return await listBlogsWithCategoriesAndTags(skip, limit)
     .then((data) => {
       // console.log('getInitialProps data: ', data)

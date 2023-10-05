@@ -30,6 +30,12 @@ const AdminIndex = () => {
               >
                 <Link href={`${url}/crud/blog`}>Create Blog</Link>
               </li>
+              <li
+                className="inline-flex items-center gap-x-2 py-3 px-4 text-sm font-medium bg-white border text-gray-800 -mt-px 
+                first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-black dark:border-gray-700 dark:text-white"
+              >
+                <Link href={`${url}/crud/blogs`}>Update/Delete Blogs</Link>
+              </li>
             </ul>
           </div>
         </div>
