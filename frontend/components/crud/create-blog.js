@@ -255,7 +255,7 @@ const CreateBlog = ({ router }) => {
           </div>
           <div>
             <ReactQuill
-              className="mt-3"
+              className="mt-3 max-w-screen-lg"
               modules={CreateBlog.modules}
               formats={CreateBlog.formats}
               value={body}

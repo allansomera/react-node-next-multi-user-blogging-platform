@@ -30,7 +30,7 @@ const SmallCard = ({ blog }) => {
             <Link href={`/blogs/${blog.slug}`}>
               <h5>{blog.title}</h5>
             </Link>
-            <div>{htmr(blog.excerpt)}</div>
+            <div className="overflow-x-hidden">{htmr(blog.excerpt)}</div>
           </section>
         </div>
         <div className="small-card__body">

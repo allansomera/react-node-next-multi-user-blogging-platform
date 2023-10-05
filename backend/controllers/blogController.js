@@ -384,7 +384,7 @@ exports.update = async (req, res) => {
       form.parse(req, async (_err, fields, files) => {
         let slugBeforeMerge = old_blog.slug
         //
-        console.log('fields', fields)
+        console.log('update fields', fields)
         let categories
         let tags
         let title
@@ -395,6 +395,7 @@ exports.update = async (req, res) => {
             fields.categories[0].split(',').map((id) => {
               return mongoose.mongo.ObjectId.createFromHexString(id.trim())
             })
+          console.log('form categories', categories)
         }
 
         if (fields.hasOwnProperty('tags')) {
@@ -427,9 +428,25 @@ exports.update = async (req, res) => {
           new_fields = { ...new_fields, title }
         }
 
+        console.log('update new_fields', new_fields)
+
         // let new_fields = { ...fields, categories, tags }
 
-        old_blog = _.merge(old_blog, new_fields)
+        // old_blog = _.merge(old_blog, new_fields)
+
+        // this merge will replace the old array with the new array
+        old_blog = _.mergeWith(old_blog, new_fields, (_a, b) =>
+          _.isObject(b) ? b : undefined
+        )
+
+        // fields
+        // form categories [
+        //   new ObjectId("650663e514ded6d67ea326f5"),
+        //   new ObjectId("6506a8dda0624a7eb98e27f7")
+
+        // old_blog = _.mergeWith(old_blog, new_fields)
+        // old_blog = { ...old_blog, ...new_fields }
+        // old_blog = Object.assign({}, old_blog, new_fields)
 
         old_blog.slug = slugBeforeMerge
 
@@ -521,6 +538,7 @@ exports.list_related = async (req, res) => {
   // find other blogs not including itself
   await Blog.find({ _id: { $ne: _id }, categories: { $in: categories } })
     .limit(limit)
+    .sort({ createdAt: -1 })
     .populate('postedBy', '_id name profile')
     .select('title slug excerpt postedBy createdAt updatedAt')
     .exec()

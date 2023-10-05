@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { API } from 'config'
+import { API, DOMAIN } from 'config'
 import Image from 'next/image'
 
 import dayjs from 'dayjs'
@@ -68,14 +68,16 @@ const Card = ({ blog }) => {
         </div>
         <div className="flex flex-row ml-2">
           <div>
-            <Image
-              // className="max-w-[250px] max-h-[250px]"
-              className="w-auto h-auto"
-              height={250}
-              width={250}
-              src={`${API}/api/blog/photo/${blog.slug}`}
-              alt={blog.title}
-            />
+            <Link href={`/blogs/${blog.slug}`}>
+              <Image
+                // className="max-w-[250px] max-h-[250px]"
+                className="w-auto h-auto"
+                height={250}
+                width={250}
+                src={`${API}/api/blog/photo/${blog.slug}`}
+                alt={blog.title}
+              />
+            </Link>
           </div>
           <div className="w-3/4 max-w-32 h-auto px-4 py-4 border-dashed border-1 border-blue-500">
             <section className="pb-5 ">
