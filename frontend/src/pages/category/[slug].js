@@ -18,6 +18,7 @@ const RelatedCategories = ({
   // blogsLimit,
   // blogsSkip,
   router,
+  query,
 }) => {
   // let all_count = totalBlogsByCategory
   // console.log('blogs =>', blogs)
@@ -35,19 +36,16 @@ const RelatedCategories = ({
         <title>Programming blogs | {APP_NAME}</title>
         <meta
           name="description"
-          content="Programming blogs and tutorials on react node next web development"
+          content={`Best programming tutorials on ${category.name}`}
         />
-        <link rel="canonical" href={`${DOMAIN}${router.pathname}`} />
-        <meta
-          property="og:title"
-          content={`Latest web development tutorials | ${APP_NAME}`}
-        />
+        <link rel="canonical" href={`${DOMAIN}/tag/${query.slug}`} />
+        <meta property="og:title" content={`${category.name}| ${APP_NAME}`} />
         <meta
           property="og:description"
-          content="Programming blogs and tutorials on react node next web development"
+          content={`Best programming tutorials on ${category.name}`}
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content={`${DOMAIN}${router.pathname}`} />
+        <meta property="og:url" content={`${DOMAIN}/category/${query.slug}`} />
         <meta property="og:site_name" content={`${APP_NAME}`} />
 
         <meta
@@ -242,7 +240,7 @@ RelatedCategories.getInitialProps = async ({ query }) => {
   // )
   return await singleCategory(query.slug).then((data) => {
     console.log('singleCategory', data)
-    return { category: data.category, blogs: data.blogs }
+    return { category: data.category, blogs: data.blogs, query }
   })
 }
 
