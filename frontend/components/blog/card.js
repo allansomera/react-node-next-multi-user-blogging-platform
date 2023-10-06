@@ -10,12 +10,13 @@ const Card = ({ blog }) => {
   dayjs.extend(relativeTime)
 
   const showBlogCategories = () => {
+    console.log('showBlogCategories(): ', blog.categories)
     return (
       <>
         {blog.categories.map((category) => {
           return (
             <article key={category._id}>
-              <Link href={`/categories/${category.slug}`}>
+              <Link href={`/category/${category.slug}`}>
                 <div className="mr-1 border-solid border-1 bg-sky-700 text-white p-2 rounded">
                   {category.name}
                 </div>
@@ -28,6 +29,7 @@ const Card = ({ blog }) => {
   }
 
   const showBlogTags = () => {
+    console.log('showBlogTags(): ', blog.tags)
     return (
       <>
         {blog.tags.map((tag) => {

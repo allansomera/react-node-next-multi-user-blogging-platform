@@ -3,31 +3,29 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { withRouter } from 'next/router'
 
-import { listBlogsWithCategoriesAndTags } from '@actions/blog'
+import { relatedBlogsByCategories } from '@actions/blog'
 
 import { API, DOMAIN, APP_NAME } from 'config'
 import Card from '@components/blog/card'
 import { Button } from '@nextui-org/react'
 
 //you also get router as props by default when you includ withRouter from 'next/router'
-const Blogs = ({
+const RelatedCategories = ({
   blogs,
-  categories,
-  tags,
-  totalBlogs,
+  totalBlogsByCategory,
   blogsLimit,
-  blogSkip,
-  all_count,
+  blogsSkip,
   router,
 }) => {
+  let all_count = totalBlogsByCategory
   console.log('blogs =>', blogs)
-  console.log('blogs.categories =>', blogs.categories)
-  console.log('categories =>', categories)
-  console.log('tags =>', tags)
-  console.log('totalBlogs=>', totalBlogs)
-  console.log('all_count=>', all_count)
-  console.log('blogsLimit=>', blogsLimit)
-  console.log('blogSkip=>', blogSkip)
+  // console.log('blogs.categories =>', blogs.categories)
+  // console.log('categories =>', categories)
+  // console.log('tags =>', tags)
+  // console.log('totalBlogs=>', totalBlogs)
+  // console.log('all_count=>', all_count)
+  // console.log('blogsLimit=>', blogsLimit)
+  // console.log('blogSkip=>', blogSkip)
 
   const head = () => {
     return (
@@ -65,7 +63,7 @@ const Blogs = ({
 
   const [limit, setLimit] = useState(blogsLimit)
   const [skip, setSkip] = useState(0)
-  const [size, setSize] = useState(totalBlogs)
+  const [size, setSize] = useState(totalBlogsByCategory)
   const [loadedBlogs, setLoadedBlogs] = useState([])
 
   const loadMore = async () => {
@@ -74,7 +72,7 @@ const Blogs = ({
     console.log('before skip=>', skip)
     console.log('before size=>', size)
     console.log('before loadedBlogs =>', loadedBlogs)
-    await listBlogsWithCategoriesAndTags(toSkip, limit)
+    await relatedBlogsByCategories(toSkip, limit)
       .then((data) => {
         console.log('loadMore data => ', data)
         setLoadedBlogs([...loadedBlogs, ...data.blogs])
@@ -131,40 +129,40 @@ const Blogs = ({
     )
   }
 
-  const showAllCategories = () => {
-    return (
-      <>
-        <div className="flex flex-row">
-          {categories.map((category, i) => {
-            return (
-              <Link key={i} href={`/category/${category.slug}`}>
-                <div className="mr-1 border-solid border-1 bg-sky-700 text-white p-2 rounded">
-                  {category.name}
-                </div>
-              </Link>
-            )
-          })}
-        </div>
-      </>
-    )
-  }
-  const showAllTags = () => {
-    return (
-      <>
-        <div className="flex flex-row">
-          {tags.map((tag, i) => {
-            return (
-              <Link key={i} href={`/tags/${tag.slug}`}>
-                <div className="mr-1 border-solid border-1 border-sky-300 bg-transparent text-sky-300 p-2 rounded">
-                  {`#${tag.name}`}
-                </div>
-              </Link>
-            )
-          })}
-        </div>
-      </>
-    )
-  }
+  // const showAllCategories = () => {
+  //   return (
+  //     <>
+  //       <div className="flex flex-row">
+  //         {categories.map((category, i) => {
+  //           return (
+  //             <Link key={i} href={`/categories/${category.slug}`}>
+  //               <div className="mr-1 border-solid border-1 bg-sky-700 text-white p-2 rounded">
+  //                 {category.name}
+  //               </div>
+  //             </Link>
+  //           )
+  //         })}
+  //       </div>
+  //     </>
+  //   )
+  // }
+  // const showAllTags = () => {
+  //   return (
+  //     <>
+  //       <div className="flex flex-row">
+  //         {tags.map((tag, i) => {
+  //           return (
+  //             <Link key={i} href={`/tags/${tag.slug}`}>
+  //               <div className="mr-1 border-solid border-1 border-sky-300 bg-transparent text-sky-300 p-2 rounded">
+  //                 {`#${tag.name}`}
+  //               </div>
+  //             </Link>
+  //           )
+  //         })}
+  //       </div>
+  //     </>
+  //   )
+  // }
 
   return (
     <>
@@ -174,13 +172,16 @@ const Blogs = ({
           <header>
             <div className="">
               <h1 className="text-center text-5xl font-bold">
-                programming blog and tutorials
+                {router.query.slug}
               </h1>
             </div>
-            <section className="flex flex-col mt-8 mb-3 gap-2 items-center">
-              {showAllCategories()}
-              {showAllTags()}
-            </section>
+
+            {
+              // <section className="flex flex-col mt-8 mb-3 gap-2 items-center">
+              // {showAllCategories()}
+              // {showAllTags()}
+              // </section>
+            }
           </header>
         </div>
         <div className="blogs">
@@ -202,28 +203,40 @@ const Blogs = ({
 
 // after it calls this method and we get a successful response from the backend
 // we are able to access the object as props, in this case {blogs, categories, tags, size}
-Blogs.getInitialProps = async () => {
+RelatedCategories.getInitialProps = async ({ query }) => {
   //think of skip to be the index of the array, if skip equals to 2, it will start from the 3rd index
   // of the blog
   let skip = 0
-  let limit = 3
-  return await listBlogsWithCategoriesAndTags(skip, limit)
-    .then((data) => {
-      // console.log('getInitialProps data: ', data)
+  let limit = 0
+  // return await listBlogsWithCategoriesAndTags(skip, limit)
+  //   .then((data) => {
+  //     // console.log('getInitialProps data: ', data)
+  //     return {
+  //       blogs: data.blogs,
+  //       categories: data.categories,
+  //       tags: data.tags,
+  //       totalBlogs: data.size,
+  //       blogsLimit: limit,
+  //       blogSkip: skip,
+  //       all_count: data.all_count,
+  //     }
+  //   })
+  //   .catch((error) => {
+  //     console.log(error.message)
+  //   })
+
+  return await relatedBlogsByCategories(query.slug, skip, limit).then(
+    (data) => {
+      console.log('related data', data)
       return {
         blogs: data.blogs,
-        categories: data.categories,
-        tags: data.tags,
-        totalBlogs: data.size,
+        totalBlogsByCategory: data.size,
         blogsLimit: limit,
-        blogSkip: skip,
-        all_count: data.all_count,
+        blogsSkip: skip,
       }
-    })
-    .catch((error) => {
-      console.log(error.message)
-    })
+    }
+  )
 }
 
-export default withRouter(Blogs)
+export default withRouter(RelatedCategories)
 //getInitialProps
