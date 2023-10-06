@@ -10,12 +10,13 @@ const Card = ({ blog }) => {
   dayjs.extend(relativeTime)
 
   const showBlogCategories = () => {
+    console.log('showBlogCategories(): ', blog.categories)
     return (
       <>
         {blog.categories.map((category) => {
           return (
             <article key={category._id}>
-              <Link href={`/categories/${category.slug}`}>
+              <Link href={`/category/${category.slug}`}>
                 <div className="mr-1 border-solid border-1 bg-sky-700 text-white p-2 rounded">
                   {category.name}
                 </div>
@@ -28,12 +29,13 @@ const Card = ({ blog }) => {
   }
 
   const showBlogTags = () => {
+    console.log('showBlogTags(): ', blog.tags)
     return (
       <>
         {blog.tags.map((tag) => {
           return (
             <article key={tag._id}>
-              <Link href={`/tags/${tag.slug}`}>
+              <Link href={`/tag/${tag.slug}`}>
                 <div className="mr-1 border-solid border-1 border-sky-300 bg-transparent text-sky-300 p-2 rounded">
                   {`#${tag.name}`}
                 </div>
@@ -84,7 +86,7 @@ const Card = ({ blog }) => {
               <div>{htmr(blog.excerpt)}</div>
             </section>
             <Link
-              href={`/blog/${blog.slug}`}
+              href={`/blogs/${blog.slug}`}
               className="bg-green-800 text-white-400 w-full p-[8px] rounded-md"
             >
               Read More

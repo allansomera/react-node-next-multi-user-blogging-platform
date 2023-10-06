@@ -107,8 +107,8 @@ export const listBlogsWithCategoriesAndTags = (skip, limit) => {
     .catch((error) => console.log(error.message))
 }
 
-export const relatedBlogsByCategories = (cat_id) => {
-  const data = { cat_id }
+export const relatedBlogsByCategories = (cat_slug, skip, limit) => {
+  const data = { cat_slug, skip, limit }
   return axios
     .post(`${API}/api/blogs/related/categories`, data)
     .then((response) => {

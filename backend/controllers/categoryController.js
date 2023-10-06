@@ -1,4 +1,5 @@
 const Category = require('../models/categoryModel')
+const Blog = require('../models/blogModel')
 const slugify = require('slugify')
 const { errorHandler } = require('../helpers/dbErrorHandler')
 
@@ -44,7 +45,20 @@ exports.read = async (req, res) => {
     .exec()
     .then((category) => {
       //return the found category document
-      return res.status(200).json(category)
+      Blog.find({ categories: { $in: category } })
+        .populate('categories', '_id slug name')
+        .populate('tags', '_id slug name')
+        .populate('postedBy', '_id name')
+        .select(
+          '_id title slug excerpt categories tags postedBy createdAt updatedAt'
+        )
+        .sort({ createdAt: -1 })
+        .exec()
+        .then((data) => {
+          return res.status(200).json({ category: category, blogs: data })
+        })
+
+      // return res.status(200).json(category)
     })
     .catch((error) => {
       return res.status(400).json({ error: error.message })

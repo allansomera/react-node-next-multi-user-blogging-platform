@@ -180,6 +180,7 @@ exports.create = async (req, res) => {
 // read
 // remove
 exports.list = async (_, res) => {
+  // tutorial way
   // await Blog.find({})
   //   .orFail(() => new Error('Could not get blogs'))
   //   .exec()
@@ -210,6 +211,7 @@ exports.list = async (_, res) => {
   //     })
   //   })
 
+  // my way just for practice
   await Blog.aggregate([
     {
       $lookup: {
@@ -388,6 +390,8 @@ exports.update = async (req, res) => {
         let categories
         let tags
         let title
+        let body
+        let new_fields
 
         if (fields.hasOwnProperty('categories')) {
           categories =
@@ -396,6 +400,7 @@ exports.update = async (req, res) => {
               return mongoose.mongo.ObjectId.createFromHexString(id.trim())
             })
           console.log('form categories', categories)
+          new_fields = { ...fields, categories }
         }
 
         if (fields.hasOwnProperty('tags')) {
@@ -404,6 +409,13 @@ exports.update = async (req, res) => {
             fields.tags[0].split(',').map((id) => {
               return mongoose.mongo.ObjectId.createFromHexString(id.trim())
             })
+          new_fields = { ...fields, tags }
+        }
+        if (fields.hasOwnProperty('body')) {
+          body = fields.body[0]
+          excerpt = smartTrim(body, 320, ' ', ' ...')
+          mdesc = stripHtml(body.substring(0, 160)).result
+          new_fields = { ...fields, body, excerpt, mdesc }
         }
 
         // let new_fields =
@@ -412,16 +424,15 @@ exports.update = async (req, res) => {
         // console.log('categories_BE', categories)
         // console.log('tags_BE', tags)
 
-        let new_fields
-        if (categories && tags) {
-          new_fields = { ...fields, categories, tags }
-        } else if (categories) {
-          new_fields = { ...fields, categories }
-        } else if (tags) {
-          new_fields = { ...fields, tags }
-        } else {
-          new_fields = { ...fields }
-        }
+        // if (categories && tags) {
+        //   new_fields = { ...fields, categories, tags }
+        // } else if (categories) {
+        //   new_fields = { ...fields, categories }
+        // } else if (tags) {
+        //   new_fields = { ...fields, tags }
+        // } else {
+        //   new_fields = { ...fields }
+        // }
 
         if (fields.hasOwnProperty('title')) {
           title = fields.title[0]
@@ -453,15 +464,16 @@ exports.update = async (req, res) => {
         // const title = fields.title[0]
         // const body = fields.body[0]
 
-        const { body } = old_blog
+        // const { body } = old_blog
+        // const new_body = old_blog.body
 
         // const body = fields.body[0]
 
-        if (body) {
-          old_blog.excerpt = smartTrim(body, 320, ' ', ' ...')
-          old_blog.mdesc = stripHtml(body.substring(0, 160)).result
-          // console.log('old_blog.mdesc', old_blog.mdesc)
-        }
+        // if (new_body) {
+        //   old_blog.excerpt = smartTrim(new_body, 320, ' ', ' ...')
+        //   old_blog.mdesc = stripHtml(new_body.substring(0, 160)).result
+        //   // console.log('old_blog.mdesc', old_blog.mdesc)
+        // }
 
         if (files.photo) {
           if (files.photo.size > 10000000) {
@@ -488,21 +500,51 @@ exports.update = async (req, res) => {
 exports.list_related_categories = async (req, res) => {
   // let cat_slug = req.body.cat_slug
   // let cat_id = mongoose.mongo.ObjectId.createFromHexString(req.body.cat_id)
-  let cat_id = req.body.cat_id
+  let cat_slug = req.body.cat_slug
+  let skip = req.body.skip ? parseInt(req.body.skip) : 0
+  let limit = req.body.limit
+    ? parseInt(req.body.limit) <= 0
+      ? 1
+      : parseInt(req.body.limit)
+    : 10
 
+  let blogs
   await Blog.aggregate([
     {
       $lookup: {
         from: 'categories',
         localField: 'categories',
+        // foreignField: '_id',
         foreignField: '_id',
         pipeline: [{ $project: { _id: 1, name: 1, slug: 1 } }],
         as: 'categories',
       },
     },
     {
+      $lookup: {
+        from: 'tags',
+        localField: 'tags',
+        // foreignField: '_id',
+        foreignField: '_id',
+        pipeline: [{ $project: { _id: 1, name: 1, slug: 1 } }],
+        as: 'tags',
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'postedBy',
+        // foreignField: '_id',
+        foreignField: '_id',
+        pipeline: [{ $project: { _id: 1, name: 1, username: 1, profile: 1 } }],
+        as: 'postedBy',
+      },
+    },
+    { $unwind: '$postedBy' },
+    {
       $match: {
-        'categories._id': new mongoose.Types.ObjectId(cat_id),
+        // 'categories._id': new mongoose.Types.ObjectId(cat_id),
+        'categories.slug': cat_slug,
         // 'categories._id': cat_id,
       },
     },
@@ -521,8 +563,20 @@ exports.list_related_categories = async (req, res) => {
     //   $match: { categories: { $ne: [] } },
     // },
   ])
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 })
+    // .select(
+    //   '_id title slug excerpt categories tags postedBy createdAt updatedAt'
+    // )
+    .exec()
+    // .orFail(() => new Error('Couldnt find blogs by categories'))
     .then((data) => {
-      return res.status(200).json(data)
+      // let all_count = data.estimatedDocumentCount()
+      //   .json({ blogs, categories, tags, size: blogs.length, all_count })
+      // console.log('BE data', data)
+      blogs = data
+      return res.status(200).json({ blogs, size: blogs.length })
     })
     .catch((error) => {
       return res.status(400).json(error.message)
@@ -532,7 +586,7 @@ exports.list_related_categories = async (req, res) => {
 // relative to the single blog, check related blogs by category not including
 // the current single blog
 exports.list_related = async (req, res) => {
-  let limit = req.body.limit ? parseInt(req.body.limit) : 3
+  let limit = req.body.limit ? parseInt(req.body.limit) : 10
   let { _id, categories } = req.body.blog
 
   // find other blogs not including itself

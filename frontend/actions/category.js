@@ -41,7 +41,7 @@ export const singleCategory = (slug) => {
   return axios
     .get(`${API}/api/category/${slug}`)
     .then((response) => {
-      return response.json()
+      return response.data
     })
     .catch((error) => console.log(error))
 }

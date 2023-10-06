@@ -137,7 +137,7 @@ const Blogs = ({
         <div className="flex flex-row">
           {categories.map((category, i) => {
             return (
-              <Link key={i} href={`/categories/${category.slug}`}>
+              <Link key={i} href={`/category/${category.slug}`}>
                 <div className="mr-1 border-solid border-1 bg-sky-700 text-white p-2 rounded">
                   {category.name}
                 </div>
@@ -154,7 +154,7 @@ const Blogs = ({
         <div className="flex flex-row">
           {tags.map((tag, i) => {
             return (
-              <Link key={i} href={`/tags/${tag.slug}`}>
+              <Link key={i} href={`/tag/${tag.slug}`}>
                 <div className="mr-1 border-solid border-1 border-sky-300 bg-transparent text-sky-300 p-2 rounded">
                   {`#${tag.name}`}
                 </div>

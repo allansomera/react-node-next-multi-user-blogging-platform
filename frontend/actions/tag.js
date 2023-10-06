@@ -41,7 +41,7 @@ export const singleTag = (slug) => {
   return axios
     .get(`${API}/api/tag/${slug}`)
     .then((response) => {
-      return response.status(200).json()
+      return response.data
     })
     .catch((error) => console.log(error))
 }
