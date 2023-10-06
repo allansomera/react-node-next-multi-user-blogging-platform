@@ -586,7 +586,7 @@ exports.list_related_categories = async (req, res) => {
 // relative to the single blog, check related blogs by category not including
 // the current single blog
 exports.list_related = async (req, res) => {
-  let limit = req.body.limit ? parseInt(req.body.limit) : 3
+  let limit = req.body.limit ? parseInt(req.body.limit) : 10
   let { _id, categories } = req.body.blog
 
   // find other blogs not including itself

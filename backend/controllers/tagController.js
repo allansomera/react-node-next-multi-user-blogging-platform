@@ -1,4 +1,5 @@
 const Tag = require('../models/tagsModel')
+const Blog = require('../models/blogModel')
 const slugify = require('slugify')
 
 exports.create = async (req, res) => {
@@ -36,8 +37,21 @@ exports.read = async (req, res) => {
   await Tag.findOne({ slug })
     .orFail(() => new Error(`Could not get tag ${slug}`))
     .exec()
-    .then((data) => {
-      res.status(200).json(data)
+    .then((tag) => {
+      Blog.find({ tags: { $in: tag } })
+        .populate('categories', '_id name slug')
+        .populate('tags', '_id name slug')
+        .populate('postedBy', '_id name')
+        .select(
+          '_id title slug excerpt categories tags postedBy createdAt updatedAt'
+        )
+        .sort({ createdAt: -1 })
+        .exec()
+        .then((data) => {
+          console.log('tag.read', data)
+          return res.json({ tag: tag, blogs: data })
+        })
+      // res.status(200).json(data)
     })
     .catch((error) => {
       return res.status(400).json({ error: error.message })

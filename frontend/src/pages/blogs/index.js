@@ -154,7 +154,7 @@ const Blogs = ({
         <div className="flex flex-row">
           {tags.map((tag, i) => {
             return (
-              <Link key={i} href={`/tags/${tag.slug}`}>
+              <Link key={i} href={`/tag/${tag.slug}`}>
                 <div className="mr-1 border-solid border-1 border-sky-300 bg-transparent text-sky-300 p-2 rounded">
                   {`#${tag.name}`}
                 </div>

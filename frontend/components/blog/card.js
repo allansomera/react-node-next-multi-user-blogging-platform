@@ -35,7 +35,7 @@ const Card = ({ blog }) => {
         {blog.tags.map((tag) => {
           return (
             <article key={tag._id}>
-              <Link href={`/tags/${tag.slug}`}>
+              <Link href={`/tag/${tag.slug}`}>
                 <div className="mr-1 border-solid border-1 border-sky-300 bg-transparent text-sky-300 p-2 rounded">
                   {`#${tag.name}`}
                 </div>
@@ -86,7 +86,7 @@ const Card = ({ blog }) => {
               <div>{htmr(blog.excerpt)}</div>
             </section>
             <Link
-              href={`/blog/${blog.slug}`}
+              href={`/blogs/${blog.slug}`}
               className="bg-green-800 text-white-400 w-full p-[8px] rounded-md"
             >
               Read More

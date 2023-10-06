@@ -52,6 +52,7 @@ exports.read = async (req, res) => {
         .select(
           '_id title slug excerpt categories tags postedBy createdAt updatedAt'
         )
+        .sort({ createdAt: -1 })
         .exec()
         .then((data) => {
           return res.status(200).json({ category: category, blogs: data })
