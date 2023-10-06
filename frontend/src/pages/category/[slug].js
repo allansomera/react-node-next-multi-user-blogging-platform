@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { withRouter } from 'next/router'
 
 import { relatedBlogsByCategories } from '@actions/blog'
+import { singleCategory } from '@actions/category'
 
 import { API, DOMAIN, APP_NAME } from 'config'
 import Card from '@components/blog/card'
@@ -12,13 +13,14 @@ import { Button } from '@nextui-org/react'
 //you also get router as props by default when you includ withRouter from 'next/router'
 const RelatedCategories = ({
   blogs,
-  totalBlogsByCategory,
-  blogsLimit,
-  blogsSkip,
+  category,
+  // totalBlogsByCategory,
+  // blogsLimit,
+  // blogsSkip,
   router,
 }) => {
-  let all_count = totalBlogsByCategory
-  console.log('blogs =>', blogs)
+  // let all_count = totalBlogsByCategory
+  // console.log('blogs =>', blogs)
   // console.log('blogs.categories =>', blogs.categories)
   // console.log('categories =>', categories)
   // console.log('tags =>', tags)
@@ -61,59 +63,59 @@ const RelatedCategories = ({
     )
   }
 
-  const [limit, setLimit] = useState(blogsLimit)
-  const [skip, setSkip] = useState(0)
-  const [size, setSize] = useState(totalBlogsByCategory)
-  const [loadedBlogs, setLoadedBlogs] = useState([])
-
-  const loadMore = async () => {
-    let toSkip = skip + limit
-    console.log('before limit =>', limit)
-    console.log('before skip=>', skip)
-    console.log('before size=>', size)
-    console.log('before loadedBlogs =>', loadedBlogs)
-    await relatedBlogsByCategories(toSkip, limit)
-      .then((data) => {
-        console.log('loadMore data => ', data)
-        setLoadedBlogs([...loadedBlogs, ...data.blogs])
-        setSize(data.size)
-        setSkip(toSkip)
-
-        console.log('current limit =>', limit)
-        console.log('current skip=>', skip)
-        console.log('current size=>', size)
-        console.log('current loadedBlogs =>', loadedBlogs)
-      })
-      .catch((error) => {
-        console.log(error.message)
-      })
-  }
+  // const [limit, setLimit] = useState(blogsLimit)
+  // const [skip, setSkip] = useState(0)
+  // const [size, setSize] = useState(totalBlogsByCategory)
+  // const [loadedBlogs, setLoadedBlogs] = useState([])
+  //
+  // const loadMore = async () => {
+  //   let toSkip = skip + limit
+  //   console.log('before limit =>', limit)
+  //   console.log('before skip=>', skip)
+  //   console.log('before size=>', size)
+  //   console.log('before loadedBlogs =>', loadedBlogs)
+  //   await relatedBlogsByCategories(toSkip, limit)
+  //     .then((data) => {
+  //       console.log('loadMore data => ', data)
+  //       setLoadedBlogs([...loadedBlogs, ...data.blogs])
+  //       setSize(data.size)
+  //       setSkip(toSkip)
+  //
+  //       console.log('current limit =>', limit)
+  //       console.log('current skip=>', skip)
+  //       console.log('current size=>', size)
+  //       console.log('current loadedBlogs =>', loadedBlogs)
+  //     })
+  //     .catch((error) => {
+  //       console.log(error.message)
+  //     })
+  // }
 
   //all_count represents the whole count from blogs collection, need to -1 because count starts from 0
   // because skip starts from 0
-  const loadMoreButton = () => {
-    return (
-      size > 0 &&
-      size >= limit &&
-      skip !== all_count - 1 &&
-      limit !== all_count &&
-      limit !== 0 && <Button onClick={loadMore}>Load More</Button>
-    )
-  }
+  // const loadMoreButton = () => {
+  //   return (
+  //     size > 0 &&
+  //     size >= limit &&
+  //     skip !== all_count - 1 &&
+  //     limit !== all_count &&
+  //     limit !== 0 && <Button onClick={loadMore}>Load More</Button>
+  //   )
+  // }
 
-  const showLoadedBlogs = () => {
-    return (
-      <>
-        {loadedBlogs.map((blog) => {
-          return (
-            <article key={blog._id}>
-              <Card blog={blog} />
-            </article>
-          )
-        })}
-      </>
-    )
-  }
+  // const showLoadedBlogs = () => {
+  //   return (
+  //     <>
+  //       {loadedBlogs.map((blog) => {
+  //         return (
+  //           <article key={blog._id}>
+  //             <Card blog={blog} />
+  //           </article>
+  //         )
+  //       })}
+  //     </>
+  //   )
+  // }
 
   const showAllBlogs = () => {
     return (
@@ -172,7 +174,7 @@ const RelatedCategories = ({
           <header>
             <div className="">
               <h1 className="text-center text-5xl font-bold">
-                {router.query.slug}
+                {category.name}
               </h1>
             </div>
 
@@ -189,12 +191,14 @@ const RelatedCategories = ({
           <div className="blogs__container border-green-200 border-dashed border-1">
             {showAllBlogs()}
           </div>
-          <div className="blogs__loadmore border-green-200 border-dashed border-1">
-            {showLoadedBlogs()}
-          </div>
-          <div className="blogs__loadmore-btn border-green-200 border-dashed border-1">
-            {loadMoreButton()}
-          </div>
+          {
+            // <div className="blogs__loadmore border-green-200 border-dashed border-1">
+            // {showLoadedBlogs()}
+            // </div>
+            // <div className="blogs__loadmore-btn border-green-200 border-dashed border-1">
+            // {loadMoreButton()}
+            // </div>
+          }
         </div>
       </main>
     </>
@@ -225,17 +229,21 @@ RelatedCategories.getInitialProps = async ({ query }) => {
   //     console.log(error.message)
   //   })
 
-  return await relatedBlogsByCategories(query.slug, skip, limit).then(
-    (data) => {
-      console.log('related data', data)
-      return {
-        blogs: data.blogs,
-        totalBlogsByCategory: data.size,
-        blogsLimit: limit,
-        blogsSkip: skip,
-      }
-    }
-  )
+  // return await relatedBlogsByCategories(query.slug, skip, limit).then(
+  //   (data) => {
+  //     console.log('related data', data)
+  //     return {
+  //       blogs: data.blogs,
+  //       totalBlogsByCategory: data.size,
+  //       blogsLimit: limit,
+  //       blogsSkip: skip,
+  //     }
+  //   }
+  // )
+  return await singleCategory(query.slug).then((data) => {
+    console.log('singleCategory', data)
+    return { category: data.category, blogs: data.blogs }
+  })
 }
 
 export default withRouter(RelatedCategories)
