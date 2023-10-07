@@ -14,6 +14,7 @@ import {
   Button,
 } from '@nextui-org/react'
 import Router, { useRouter } from 'next/router'
+import Search from '@components/blog/search'
 
 const changeComplete = () => {
   nProgress.set(0.99)
@@ -56,71 +57,74 @@ const Header = () => {
   //   }
   // }, [router.asPath])
   return (
-    <Navbar className="bg-black">
-      <Link href="/">
-        <NavbarBrand>
-          <AcmeLogo />
-          <p className="font-bold text-inherit">{APP_NAME}</p>
-        </NavbarBrand>
-      </Link>
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        {
-          <NavbarItem>
-            <Link href="/blogs">Blog</Link>
-          </NavbarItem>
-        }
-        {!isAuth() && (
-          <>
+    <>
+      <Navbar className="bg-black">
+        <Link href="/">
+          <NavbarBrand>
+            <AcmeLogo />
+            <p className="font-bold text-inherit">{APP_NAME}</p>
+          </NavbarBrand>
+        </Link>
+        <NavbarContent className="hidden sm:flex gap-4" justify="center">
+          {
             <NavbarItem>
-              <Link color="foreground" href="/signup">
-                Sign Up
-              </Link>
+              <Link href="/blogs">Blog</Link>
             </NavbarItem>
-            <NavbarItem>
-              <Link color="foreground" href="/signin">
-                Sign In
-              </Link>
-            </NavbarItem>
-          </>
-        )}
-        {isAuth() && (
-          <>
-            <NavbarItem>
-              {isAuth().role === 0 ? (
-                <Link color="foreground" href="/user">
-                  Dashboard
+          }
+          {!isAuth() && (
+            <>
+              <NavbarItem>
+                <Link color="foreground" href="/signup">
+                  Sign Up
                 </Link>
-              ) : (
-                <Link color="foreground" href="/admin">
-                  Dashboard
+              </NavbarItem>
+              <NavbarItem>
+                <Link color="foreground" href="/signin">
+                  Sign In
                 </Link>
-              )}
-            </NavbarItem>
-            <NavbarItem>
-              <Button
-                className="bg-blue-500 text-white-500"
-                onClick={() => signout(() => Router.replace(`/signin`))}
-              >
-                Sign out
-              </Button>
-            </NavbarItem>
-          </>
-        )}
-      </NavbarContent>
+              </NavbarItem>
+            </>
+          )}
+          {isAuth() && (
+            <>
+              <NavbarItem>
+                {isAuth().role === 0 ? (
+                  <Link color="foreground" href="/user">
+                    Dashboard
+                  </Link>
+                ) : (
+                  <Link color="foreground" href="/admin">
+                    Dashboard
+                  </Link>
+                )}
+              </NavbarItem>
+              <NavbarItem>
+                <Button
+                  className="bg-blue-500 text-white-500"
+                  onClick={() => signout(() => Router.replace(`/signin`))}
+                >
+                  Sign out
+                </Button>
+              </NavbarItem>
+            </>
+          )}
+        </NavbarContent>
 
-      {
-        // <NavbarContent justify="end">
-        //   <NavbarItem className="hidden lg:flex">
-        //   <Link href="#">Login</Link>
-        //   </NavbarItem>
-        //   <NavbarItem>
-        //     <Button as={Link} color="primary" href="#" variant="flat">
-        //     Sign Up
-        //     </Button>
-        //   </NavbarItem>
-        // </NavbarContent>
-      }
-    </Navbar>
+        {
+          // <NavbarContent justify="end">
+          //   <NavbarItem className="hidden lg:flex">
+          //   <Link href="#">Login</Link>
+          //   </NavbarItem>
+          //   <NavbarItem>
+          //     <Button as={Link} color="primary" href="#" variant="flat">
+          //     Sign Up
+          //     </Button>
+          //   </NavbarItem>
+          // </NavbarContent>
+        }
+      </Navbar>
+      <Search />
+    </>
   )
 }
 

@@ -622,3 +622,42 @@ exports.photo = async (req, res) => {
       })
     })
 }
+
+exports.list_search = async (req, res) => {
+  console.log('query string: ', req.query)
+  const { search } = req.query
+
+  // tutorial way
+  // if (search) {
+  //   Blog.find(
+  //     {
+  //       $or: [
+  //         { title: { $regex: search, $options: 'i' } },
+  //         { body: { $regex: search, $options: 'i' } },
+  //       ],
+  //     },
+  //     (err, blogs) => {
+  //       if (err) {
+  //         return res.status(400).json({ error: err.message })
+  //       }
+  //       res.json(blogs)
+  //     }
+  //   ).select('-photo -body')
+  // }
+
+  // mongoose query builder way
+  if (search) {
+    Blog.find()
+      .or([
+        { title: { $regex: search, $options: 'i' } },
+        { body: { $regex: search, $options: 'i' } },
+      ])
+      .select('-photo -body')
+      .then((data) => {
+        return res.status(200).json(data)
+      })
+      .catch((error) => {
+        return res.status(400).json({ error: error.message })
+      })
+  }
+}
