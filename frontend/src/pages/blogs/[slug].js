@@ -117,7 +117,7 @@ const SingleBlog = ({ blog, query }) => {
         {blog.tags.map((tag) => {
           return (
             <article key={tag._id}>
-              <Link href={`/tags/${tag.slug}`}>
+              <Link href={`/tag/${tag.slug}`}>
                 <div className="mr-1 border-solid border-1 border-sky-300 bg-transparent text-sky-300 p-2 rounded">
                   {`#${tag.name}`}
                 </div>

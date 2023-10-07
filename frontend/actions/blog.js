@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { API } from 'config'
+import queryString from 'query-string'
 
 export const createBlog = (blog, token) => {
   // let { email, password } = user
@@ -153,5 +154,19 @@ export const updateBlog = (blog, token, slug) => {
     .catch((err) => {
       console.log('actions auth axios error:', err.message)
       return err.response.data
+    })
+}
+export const listSearch = (params) => {
+  console.log('search params: ', params)
+  let query = queryString.stringify(params)
+  console.log('queryString: ', params)
+  return axios
+    .get(`${API}/api/blogs/search?${query}`)
+    .then((response) => {
+      console.log('/blogs/search', response.data)
+      return response.data
+    })
+    .catch((error) => {
+      console.log(error.message)
     })
 }

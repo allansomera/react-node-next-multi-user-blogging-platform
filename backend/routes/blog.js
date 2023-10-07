@@ -37,5 +37,6 @@ router
 
 router.route('/blogs/related').post(blogController.list_related)
 router.route('/blog/photo/:slug').get(blogController.photo)
+router.route('/blogs/search').get(blogController.list_search)
 
 module.exports = router
