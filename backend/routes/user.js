@@ -11,4 +11,8 @@ router.route('/profile').get(
   userController.read
 )
 
+router.route('/users').get(userController.all_users)
+
+router.route('/user/:username').get(userController.publicProfile)
+
 module.exports = router
