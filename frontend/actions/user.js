@@ -23,3 +23,35 @@ export const all_user_paths = () => {
       console.log(error.message)
     })
 }
+
+export const getProfile = (token) => {
+  return axios
+    .get(`${API}/api/user/profile`, {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data
+    })
+    .catch((error) => {
+      console.log(error.message)
+    })
+}
+
+export const update = (token, user) => {
+  return axios
+    .put(`${API}/api/user/update`, {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => {
+      return response.data
+    })
+    .catch((error) => {
+      console.log(error.message)
+    })
+}

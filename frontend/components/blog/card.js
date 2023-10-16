@@ -60,7 +60,7 @@ const Card = ({ blog }) => {
           <p className="mark bg-neutral-500 text-black p-2 mb-2">
             written by{' '}
             <Link href={`/profile/${blog.postedBy.username}`}>
-              {blog.postedBy.name}
+              {blog.postedBy.username}
             </Link>
             | published
             {` ${dayjs(blog.updatedAt.toString()).fromNow()}`}

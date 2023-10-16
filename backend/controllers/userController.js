@@ -59,3 +59,49 @@ exports.all_users = (_req, res) => {
       return res.status(200).json(data)
     })
 }
+
+exports.update_profile = (req, res) => {
+  let form = new formidable.IncomingForm({ keepExtension: true })
+  form.parse(req, (err, fields, files) => {
+    if (err) {
+      return res.status(400).json({
+        error: 'Photo could not be uploaded',
+      })
+    }
+    let user = req.profile
+    user = _.extend(user, fields)
+    if (files.photo) {
+      if (files.photo.size > 100000) {
+        return res.status(400).json({
+          error: 'Image should be less than 1mb',
+        })
+      }
+      user.photo.data = fs.readFileSync(files.photo.path)
+      user.photo.contentType = files.photo.type
+      user.save((err, result) => {
+        if (err) {
+          return res.status(400).json({
+            error: error.message,
+          })
+        }
+        user.hashed_password = undefined
+        res.json(user)
+      })
+    }
+  })
+}
+exports.photo = (req, res) => {
+  const username = req.params.username
+  User.findOne({ username })
+    .orFail(() => new Error('User not found'))
+    .exec()
+    .then((user) => {
+      if (user.photo.data) {
+        res.set('Content-Type', user.photo.contentType)
+        return res.send(user.photo.data)
+      }
+    })
+    .catch((error) => {
+      error: error.message
+    })
+}
