@@ -1,11 +1,14 @@
 import axios from 'axios'
 import { API } from 'config'
 import queryString from 'query-string'
+import { isAuth } from './auth'
 
 export const createBlog = (blog, token) => {
   // let { email, password } = user
+  let create_blog_endpoint =
+    isAuth() && isAuth().role === 1 ? `${API}/api/blog` : `${API}/api/user/blog`
   let reqOptions = {
-    url: `${API}/api/blog`,
+    url: `${create_blog_endpoint}`,
     method: 'POST',
     data: blog,
     headers: {

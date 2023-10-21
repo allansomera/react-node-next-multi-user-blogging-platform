@@ -41,13 +41,20 @@ export const getProfile = (token) => {
 }
 
 export const update = (token, user) => {
+  console.log('update(): ', user)
+
+  let reqOptions = {
+    url: `${API}/api/user/update`,
+    method: 'PUT',
+    data: user,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      // 'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  }
   return axios
-    .put(`${API}/api/user/update`, {
-      headers: {
-        Accept: 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    .request(reqOptions)
     .then((response) => {
       return response.data
     })

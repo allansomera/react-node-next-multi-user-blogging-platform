@@ -163,7 +163,7 @@ exports.adminMiddleware = (req, res, next) => {
     .then((user) => {
       if (user.role !== 1) {
         return res.status(400).json({
-          error: 'Admin resouce. Access denied',
+          error: 'Admin resource. Access denied',
         })
       }
       req.profile = user

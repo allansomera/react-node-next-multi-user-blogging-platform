@@ -100,7 +100,7 @@ const Header = () => {
               </NavbarItem>
               <NavbarItem>
                 <Button
-                  className="bg-blue-500 text-white-500"
+                  className="bg-blue-500 text-white-500 rounded-md"
                   onClick={() => signout(() => Router.replace(`/signin`))}
                 >
                   Sign out
@@ -108,6 +108,21 @@ const Header = () => {
               </NavbarItem>
             </>
           )}
+
+          <NavbarItem>
+            <Button
+              className="bg-transparent border-1 border-solid border-green-500 rounded-md text-green-500"
+              onClick={() => {
+                let url =
+                  isAuth() && isAuth().role === 1
+                    ? '/admin/crud/blog'
+                    : '/user/crud/blog'
+                Router.replace(`${url}`)
+              }}
+            >
+              Write a Blog
+            </Button>
+          </NavbarItem>
         </NavbarContent>
 
         {
