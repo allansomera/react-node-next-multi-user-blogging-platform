@@ -153,7 +153,11 @@ const SingleBlog = ({ blog, query }) => {
               {blog.title}
             </h1>
             <p className="mark bg-neutral-500 text-black p-2">
-              written by {blog.postedBy.name} | published
+              written by{' '}
+              <Link href={`/profile/${blog.postedBy.username}`}>
+                {blog.postedBy.name}
+              </Link>{' '}
+              | published
               {` ${dayjs(blog.updatedAt.toString()).fromNow()}`}
             </p>
             <div className="catgory-tags__container flex mt-2">

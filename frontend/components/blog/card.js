@@ -58,7 +58,11 @@ const Card = ({ blog }) => {
         </header>
         <section>
           <p className="mark bg-neutral-500 text-black p-2 mb-2">
-            written by {blog.postedBy.name} | published
+            written by{' '}
+            <Link href={`/profile/${blog.postedBy.username}`}>
+              {blog.postedBy.username}
+            </Link>
+            | published
             {` ${dayjs(blog.updatedAt.toString()).fromNow()}`}
           </p>
         </section>

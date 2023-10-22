@@ -43,7 +43,10 @@ const SmallCard = ({ blog }) => {
             // </Link>
           }
           <div className="mt-4">
-            Posted {dayjs(blog.updatedAt).fromNow()} by {blog.postedBy.name}
+            Posted {dayjs(blog.updatedAt).fromNow()} by{' '}
+            <Link href={`/profile/${blog.postedBy.username}`}>
+              {blog.postedBy.username}
+            </Link>
           </div>
         </div>
       </div>
