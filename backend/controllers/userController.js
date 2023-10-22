@@ -95,7 +95,7 @@ exports.update_profile = (req, res) => {
       if (files.photo.size > 100000) {
         return res.status(400).json({
           error: 'Image should be less than 1mb',
-        })
+g       })
       }
       user.photo.data = fs.readFileSync(files.photo[0].filepath)
       user.photo.contentType = files.photo[0].mimetype

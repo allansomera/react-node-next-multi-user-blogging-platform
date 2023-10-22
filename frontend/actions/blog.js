@@ -68,13 +68,23 @@ export const createBlog = (blog, token) => {
   //   })
 }
 
-export const getBlogs = () => {
-  return axios
-    .get(`${API}/api/blogs`)
-    .then((response) => {
-      return response.data
-    })
-    .catch((error) => console.log(error))
+export const getBlogs = (username) => {
+  let list_blog_endpoint = username
+    ? `${API}/api/${username}/blogs`
+    : `${API}/api/blogs`
+  // let list_blog_endpoint
+  // if (username) {
+  //
+  // }
+  return (
+    axios
+      // .get(`${API}/api/blogs`)
+      .get(`${list_blog_endpoint}`)
+      .then((response) => {
+        return response.data
+      })
+      .catch((error) => console.log(error))
+  )
 }
 
 export const singleBlog = (slug) => {
@@ -88,16 +98,19 @@ export const singleBlog = (slug) => {
 }
 
 export const removeBlog = (slug, token) => {
-  return axios
-    .delete(`${API}/api/blog/${slug}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    .then((response) => {
-      return response.data
-    })
-    .catch((error) => console.log(error))
+  let remove_blog_endpoint =
+    isAuth() && isAuth().role === 1
+      ? `${API}/api/blog/${slug}`
+      : `${API}/api/user/blog/${slug}`
+  return (
+    axios
+      // .delete(`${API}/api/blog/${slug}`, {
+      .delete(`${remove_blog_endpoint}`)
+      .then((response) => {
+        return response.data
+      })
+      .catch((error) => console.log(error))
+  )
 }
 
 export const listBlogsWithCategoriesAndTags = (skip, limit) => {
@@ -138,8 +151,13 @@ export const listRelatedBlogs = (one_blog) => {
 
 export const updateBlog = (blog, token, slug) => {
   // let { email, password } = user
+  let update_blog_endpoint =
+    isAuth() && isAuth().role === 1
+      ? `${API}/api/blog/${slug}`
+      : `${API}/api/user/blog/${slug}`
   let reqOptions = {
-    url: `${API}/api/blog/${slug}`,
+    // url: `${API}/api/blog/${slug}`,
+    url: `${update_blog_endpoint}`,
     method: 'PUT',
     data: blog,
     headers: {

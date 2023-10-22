@@ -1,4 +1,5 @@
 const User = require('../models/userModel')
+const Blog = require('../models/blogModel')
 const shortId = require('shortid')
 const jwt = require('jsonwebtoken')
 const { expressjwt: expressJWT } = require('express-jwt')
@@ -167,6 +168,29 @@ exports.adminMiddleware = (req, res, next) => {
         })
       }
       req.profile = user
+      next()
+    })
+    .catch((error) => {
+      return res.status(400).json({
+        error: error.message,
+      })
+    })
+}
+
+exports.can_update_delete_blog = (req, res, next) => {
+  const slug = req.params.slug.toLowerCase()
+  Blog.findOne({ slug })
+    .exec()
+    .then((data) => {
+      // console.log('data.postedBy._id', data.postedBy._id)
+      // console.log('req.profile._id', req.profile._id)
+      // console.log('compare _id: ', data.postedBy._id === req.profile._id)
+      let authorizedUser = data.postedBy._id.equals(req.profile._id)
+      if (!authorizedUser) {
+        return res.status(400).json({
+          error: 'You are not authorized',
+        })
+      }
       next()
     })
     .catch((error) => {

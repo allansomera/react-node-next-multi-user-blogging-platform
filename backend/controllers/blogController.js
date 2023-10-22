@@ -1,6 +1,7 @@
 const Blog = require('../models/blogModel')
 const Category = require('../models/categoryModel')
 const Tag = require('../models/tagsModel')
+const User = require('../models/userModel')
 
 const formidable = require('formidable')
 const slugify = require('slugify')
@@ -660,4 +661,27 @@ exports.list_search = async (req, res) => {
         return res.status(400).json({ error: error.message })
       })
   }
+}
+
+exports.list_by_user = (req, res) => {
+  User.findOne({ username: req.params.username })
+    .exec()
+    .then((user) => {
+      let userId = user._id
+      Blog.find({ postedBy: userId })
+        .populate('categories', '_id name slug')
+        .populate('tags', '_id name slug')
+        .populate('postedBy', '_id name username')
+        .select('_id title slug postedBy createdAt updatedAt')
+        .exec()
+        .then((data) => {
+          return res.status(200).json(data)
+        })
+        .catch((error) => {
+          return res.status(400).json({ error: error.message })
+        })
+    })
+    .catch((error) => {
+      error: error.message
+    })
 }

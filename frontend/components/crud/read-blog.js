@@ -9,7 +9,7 @@ import { Button, useDisclosure } from '@nextui-org/react'
 import DeleteModal from '@components/modal/delete-modal'
 import Link from 'next/link'
 
-const ReadBlog = () => {
+const ReadBlog = ({ username }) => {
   let router = useRouter()
 
   dayjs.extend(relativeTime)
@@ -22,7 +22,7 @@ const ReadBlog = () => {
   }, [])
 
   const loadBlogs = () => {
-    getBlogs().then((data) => {
+    getBlogs(username).then((data) => {
       setBlogs(data)
     })
   }

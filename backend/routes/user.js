@@ -43,12 +43,16 @@ router
   .delete(
     authController.requireSignin,
     authController.authMiddleware,
+    authController.can_update_delete_blog,
     blogController.remove
   )
   .put(
     authController.requireSignin,
     authController.authMiddleware,
+    authController.can_update_delete_blog,
     blogController.update
   )
+
+router.route('/:username/blogs').get(blogController.list_by_user)
 
 module.exports = router

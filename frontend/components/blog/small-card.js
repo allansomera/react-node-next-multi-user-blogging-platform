@@ -12,11 +12,11 @@ const SmallCard = ({ blog }) => {
   return (
     <>
       <div className="small-card w-[300px]">
-        <section>
+        <section className="overflow-clip">
           <Link className="inline-block" href={`/blogs/${blog.slug}`}>
             <Image
               // className="max-w-[250px] max-h-[250px]"
-              className="related_image"
+              className="related__image w-auto h-auto object-cover transition duration-300 ease-out duration-0 hover:scale-110"
               height={0}
               width={0}
               src={`${API}/api/blog/photo/${blog.slug}`}
