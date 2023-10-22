@@ -141,9 +141,11 @@ const UpdateBlog = ({ router }) => {
             success: `A blog titled ${data.result.title} has been updated`,
           })
           if (isAuth() && isAuth().role === 1) {
-            Router.replace(`/admin/crud/${router.query.slug}`)
+            // Router.replace(`/admin/crud/${router.query.slug}`)
+            Router.replace(`/admin/crud/blogs`)
           } else {
-            Router.replace(`/user/crud/${router.query.slug}`)
+            // Router.replace(`/user/crud/${router.query.slug}`)
+            Router.replace(`/user/crud/blogs`)
           }
           // setBody('')
           // setCheckedCategories([])

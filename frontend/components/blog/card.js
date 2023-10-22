@@ -73,11 +73,11 @@ const Card = ({ blog }) => {
           <section className="flex mb-2">{showBlogTags(blog)}</section>
         </div>
         <div className="flex flex-row ml-2">
-          <div>
+          <div className="overflow-clip">
             <Link href={`/blogs/${blog.slug}`}>
               <Image
                 // className="max-w-[250px] max-h-[250px]"
-                className="w-auto h-auto"
+                className="w-auto h-auto object-cover transition duration-300 ease-out duration-0 hover:scale-110"
                 height={250}
                 width={250}
                 src={`${API}/api/blog/photo/${blog.slug}`}

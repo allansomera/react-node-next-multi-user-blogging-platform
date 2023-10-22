@@ -1,5 +1,8 @@
 const User = require('../models/userModel')
 const Blog = require('../models/blogModel')
+const formidable = require('formidable')
+const _ = require('lodash')
+const fs = require('fs')
 
 exports.read = (req, res) => {
   req.profile.hashed_password = undefined
@@ -61,6 +64,8 @@ exports.all_users = (_req, res) => {
 }
 
 exports.update_profile = (req, res) => {
+  //be careful req.profile is type Model, so watch what you change, it will reflect on the said
+  // user and it's data in the DB
   let form = new formidable.IncomingForm({ keepExtension: true })
   form.parse(req, (err, fields, files) => {
     if (err) {
@@ -68,26 +73,55 @@ exports.update_profile = (req, res) => {
         error: 'Photo could not be uploaded',
       })
     }
+    console.log('user : ', req.profile)
+    console.log('user fields: ', fields)
+    console.log('user files: ', files)
     let user = req.profile
-    user = _.extend(user, fields)
+    let form_fields = Object.keys(fields)
+    form_fields.forEach((i) => {
+      let new_user_field = { [i]: fields[i][0] }
+      console.log('new_obj', new_user_field)
+      user = _.extend(user, new_user_field)
+    })
+    console.log('new user fields: ', user)
+    // console.log('form files: ', form_fields)
+    // user = _.extend(user, fields)
+    if (fields.password && fields.password[0].length < 6) {
+      return res.status(400).json({
+        error: 'Password should be min 6 characters long',
+      })
+    }
     if (files.photo) {
       if (files.photo.size > 100000) {
         return res.status(400).json({
           error: 'Image should be less than 1mb',
-        })
+g       })
       }
-      user.photo.data = fs.readFileSync(files.photo.path)
-      user.photo.contentType = files.photo.type
-      user.save((err, result) => {
-        if (err) {
-          return res.status(400).json({
-            error: error.message,
-          })
-        }
-        user.hashed_password = undefined
-        res.json(user)
-      })
+      user.photo.data = fs.readFileSync(files.photo[0].filepath)
+      user.photo.contentType = files.photo[0].mimetype
     }
+    // user.save((err, result) => {
+    //   if (err) {
+    //     return res.status(400).json({
+    //       error: error.message,
+    //     })
+    //   }
+    //   user.hashed_password = undefined
+    //   res.json(user)
+    // })
+    user
+      .save()
+      .then((result) => {
+        // user.hashed_password = undefined
+        result.hashed_password = undefined
+        result.salt = undefined
+        return res.status(200).json(result)
+      })
+      .catch((error) => {
+        return res.status(400).json({
+          error: error.message,
+        })
+      })
   })
 }
 exports.photo = (req, res) => {

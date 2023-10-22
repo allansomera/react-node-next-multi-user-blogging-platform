@@ -63,7 +63,7 @@ const UserProfile = ({ user, blogs, query }) => {
             <div className="card">
               <div className="card__body">
                 <h5>{user.name}</h5>
-                <Link href={`${user.profile}`}>View Profile</Link>
+                <Link href={`${user.username}`}>View Profile</Link>
                 <p>Joined {dayjs(user.createdAt).fromNow()}</p>
               </div>
             </div>
@@ -89,8 +89,7 @@ export const getStaticProps = async (context) => {
   let query = context.params
   console.log('query', query)
   let result = await userPublicProfile(context.params.username).then((data) => {
-    // console.log('getStaticProps data => ', data)
-
+    console.log('getStaticProps data => ', data)
     return {
       user: data.user,
       blogs: data.blogs,
@@ -125,6 +124,7 @@ export const getStaticPaths = async () => {
     return { params: { username: `${user.username}` } }
   })
 
+  console.log('username_paths', username_paths)
   return {
     paths: username_paths,
     fallback: true,
