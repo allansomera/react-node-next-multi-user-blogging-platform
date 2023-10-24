@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { API } from 'config'
+import { handleResponse } from './auth'
 
 export const create = (category, token) => {
   // let { email, password } = user
@@ -18,12 +19,14 @@ export const create = (category, token) => {
       }
     )
     .then((response) => {
-      console.log('resonpose', response)
+      console.log('create category response', response)
       // console.log('resonpose.data', response.data)
       return response
     })
     .catch((err) => {
       console.log('actions auth axios error:', err.message)
+      console.log('auth error:', err)
+      handleResponse(err.response)
       return err.message
     })
 }
@@ -54,7 +57,11 @@ export const removeCategory = (slug, token) => {
       },
     })
     .then((response) => {
+      handleResponse(response)
       return response.data
     })
-    .catch((error) => console.log(error.message))
+    .catch((error) => {
+      handleResponse(err.response)
+      console.log(error.message)
+    })
 }

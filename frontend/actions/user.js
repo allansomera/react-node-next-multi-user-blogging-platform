@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { API } from 'config'
 import queryString from 'query-string'
+import { handleResponse } from './auth'
 
 export const userPublicProfile = (username) => {
   return axios
@@ -36,6 +37,7 @@ export const getProfile = (token) => {
       return response.data
     })
     .catch((error) => {
+      handleResponse(err.response)
       console.log(error.message)
     })
 }
@@ -59,6 +61,7 @@ export const update = (token, user) => {
       return response.data
     })
     .catch((error) => {
+      handleResponse(err.response)
       console.log(error.message)
     })
 }

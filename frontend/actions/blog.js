@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { API } from 'config'
 import queryString from 'query-string'
-import { isAuth } from './auth'
+import { isAuth, handleResponse } from './auth'
 
 export const createBlog = (blog, token) => {
   // let { email, password } = user
@@ -30,6 +30,7 @@ export const createBlog = (blog, token) => {
       // })
       .catch((err) => {
         console.log('actions auth axios error:', err.message)
+        handleResponse(err.response)
         return err.response.data
       })
   )
@@ -107,6 +108,7 @@ export const removeBlog = (slug, token) => {
       // .delete(`${API}/api/blog/${slug}`, {
       .delete(`${remove_blog_endpoint}`)
       .then((response) => {
+        handleResponse(response)
         return response.data
       })
       .catch((error) => console.log(error))
@@ -174,6 +176,7 @@ export const updateBlog = (blog, token, slug) => {
     })
     .catch((err) => {
       console.log('actions auth axios error:', err.message)
+      handleResponse(err.response)
       return err.response.data
     })
 }
