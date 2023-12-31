@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { API } from 'config'
+import { handleResponse } from './auth'
 
 export const create = (tag, token) => {
   // let { email, password } = user
@@ -24,6 +25,7 @@ export const create = (tag, token) => {
     })
     .catch((err) => {
       console.log('actions auth axios error:', err.message)
+      handleResponse(err.response)
       return err.response.data
     })
 }
@@ -56,5 +58,8 @@ export const removeTag = (slug, token) => {
     .then((response) => {
       return response
     })
-    .catch((error) => console.log(error))
+    .catch((error) => {
+      handleResponse(err.response)
+      console.log(error)
+    })
 }
